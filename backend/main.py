@@ -1,5 +1,6 @@
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS 
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -16,6 +17,7 @@ message_array = []
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 
 def api_call(message_array):
     print("Message array:", message_array)
