@@ -3,7 +3,7 @@ import React from 'react';
 function ChatBot({ messages, message, setMessage, sendMessage }) {
     return (
         <div style={styles.chatBotContainer}>
-            {/* Chat display */}
+            {/* Chat Display */}
             <div style={styles.messagesContainer}>
                 {messages.map((msg, index) => (
                     <div
@@ -21,15 +21,24 @@ function ChatBot({ messages, message, setMessage, sendMessage }) {
                 ))}
             </div>
 
-            {/* Input area */}
+            {/* Input Area */}
             <div style={styles.inputContainer}>
                 <input
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={(e) => {
+                        setMessage(e.target.value);
+                        console.log("Input updated to:", e.target.value); // Debug log for input changes
+                    }}
                     placeholder="Type your message"
                     style={styles.input}
                 />
-                <button onClick={sendMessage} style={styles.sendButton}>
+                <button
+                    onClick={() => {
+                        console.log("Send button clicked"); // Debug log for button clicks
+                        sendMessage(); // Trigger the sendMessage function
+                    }}
+                    style={styles.sendButton}
+                >
                     Send
                 </button>
             </div>

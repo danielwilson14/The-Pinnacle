@@ -1,24 +1,20 @@
-# backend/Dockerfile
-
-# Use an official Python runtime as a parent image
+# Use Python base image
 FROM python:3.9-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
+# Copy requirements first
 COPY requirements.txt .
+
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install bcrypt
 
-# Copy the current directory contents into the container
-COPY . .
+# Copy the rest of your code
+COPY . /app
+RUN pip show openai
 
-# Set environment variables (optional)
-ENV FLASK_APP=main.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Expose port 5000 for the Flask app
+# Expose and run
 EXPOSE 5000
-
-# Run the Flask app
-CMD ["flask", "run"]
+CMD ["python", "main.py"]

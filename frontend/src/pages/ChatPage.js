@@ -18,21 +18,49 @@ function ChatPage() {
 
 
     const sendMessage = async () => {
-        if (!message.trim()) return; // Prevent sending empty messages
+        console.log("Send button clicked with message:", message);
+    
+        if (!message.trim()) {
+            console.log("Message is empty, not sending.");
+            return;
+        }
+    
+        // Get userId from localStorage
+        const userId = localStorage.getItem("userId") || "anonymous";
+    
+        // Prepare the payload with user_id
+        const payload = {
+            user_id: userId, // Include user_id in the payload
+            message,
+            is_new_chat: messages.length === 0, // Check if it's a new chat
+        };
+    
+        console.log("Payload being sent:", payload); // Debugging log for the payload
+    
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/chat`, { message });
-            const botResponse = res.data.response;
-
+            // Send the payload to the backend
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/chat`, payload);
+            console.log("Response from API:", res.data);
+    
+            // Correctly extract the assistant's reply
+            const botResponse = res.data.assistant_reply;
+    
+            // Update messages state
             setMessages([
                 ...messages,
-                { sender: 'user', text: message },
-                { sender: 'bot', text: botResponse },
+                { sender: "user", text: message },
+                { sender: "bot", text: botResponse },
             ]);
-            setMessage(''); // Clear input after sending
+    
+            // Clear the input field
+            setMessage("");
         } catch (error) {
-            console.error('Error sending message:', error);
+            console.error("Error sending message:", error);
         }
     };
+    
+    
+    
 
     const handleLogout = () => {
         localStorage.clear(); // Clear local storage (or any session-related data)
@@ -45,17 +73,6 @@ function ChatPage() {
 
     return (
         <div style={styles.pageContainer}>
-            {/* Sidebar */}
-            <div style={styles.sidebar}>
-                <p onClick={() => handleNavigation('chat')} style={styles.sidebarItem}>New Chat</p>
-                <p onClick={() => handleNavigation('favourites')} style={styles.sidebarItem}>Favourites</p>
-                <p onClick={() => handleNavigation('calendar')} style={styles.sidebarItem}>Calendar</p>
-                <p onClick={() => handleNavigation('help')} style={styles.sidebarItem}>Professional Help</p>
-                <p onClick={() => handleNavigation('previous-chats')} style={styles.sidebarItem}>Previous Chats</p>
-                <p onClick={() => handleNavigation('settings')} style={styles.sidebarItem}>Settings</p>
-                <p onClick={() => setIsModalOpen(true)} style={styles.sidebarItem}>Logout</p>
-            </div>
-
             {/* Chat area */}
             <div style={styles.chatContainer}>
                 <ChatBot

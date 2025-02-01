@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!email || !password || !confirmPassword) {
             alert('Please fill in all fields');
             return;
@@ -17,9 +19,26 @@ function RegisterPage() {
             return;
         }
 
-        // Placeholder for registration logic
-        console.log('Registration successful!');
-        navigate('/chat'); // Navigate to the chat page upon successful registration
+        try {
+            // Send registration request to backend
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, {
+                email,
+                password,
+            });
+
+            // If registration is successful
+            if (response.status === 201) {
+                alert('Registration successful!');
+                navigate('/chat'); // Navigate to the chat page upon success
+            }
+        } catch (error) {
+            // Handle errors from the backend
+            if (error.response && error.response.data) {
+                setError(error.response.data.error || 'Something went wrong.');
+            } else {
+                setError('Failed to connect to the server.');
+            }
+        }
     };
 
     return (
@@ -54,6 +73,7 @@ function RegisterPage() {
                         style={styles.arrowIcon}
                     />
                 </button>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
                 <p style={styles.loginText}>
                     Already a user? <a href="/" style={styles.link}>Login</a>
                 </p>
@@ -68,10 +88,10 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
-        backgroundColor: '#f4f4f4', // Neutral background
+        backgroundColor: '#f4f4f4',
     },
     formContainer: {
-        backgroundColor: '#d7ede2', // Green rectangle for the form
+        backgroundColor: '#d7ede2',
         padding: '40px',
         borderRadius: '12px',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',

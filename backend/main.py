@@ -1,110 +1,233 @@
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
-from flask_cors import CORS  # Import CORS
-from bson import ObjectId
+from flask_cors import CORS
+import openai
 import os
 from dotenv import load_dotenv
-import openai  # Import the OpenAI module
+from bson.objectid import ObjectId
+import datetime
+import bcrypt
+import jwt
+from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 
 # Load environment variables
 load_dotenv()
 
-# Initialize OpenAI client
 OPENAI_KEY = os.getenv("OPENAI_KEY")
-ORG_ID = os.getenv("ORG_ID")
-OPENAI_4O = os.getenv("OPENAI_4O")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")  # Default model
+MONGO_URI = os.getenv("MONGO_URI")
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")  # JWT Secret Key
 
-# Set OpenAI API key and organization
+# Configure OpenAI
 openai.api_key = OPENAI_KEY
-openai.organization = ORG_ID
-message_array = []
 
-# Initialize Flask app
+# Initialize Flask
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-# MongoDB setup
-app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+# Configure MongoDB
+app.config["MONGO_URI"] = MONGO_URI
+app.config["JWT_SECRET_KEY"] = SECRET_KEY  # Set JWT Secret Key
 mongo = PyMongo(app)
+jwt = JWTManager(app)
 
-users = mongo.db.users
-chats = mongo.db.chats
-settings = mongo.db.settings
+users_collection = mongo.db.users
+chats_collection = mongo.db.chats
 
-def api_call(message_array):
-    print("Message array:", message_array)
+
+def call_openai(messages):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",  # Use the correct model name
-            messages=message_array
+        # Call OpenAI API using the updated syntax and correct method
+        response = openai.chat.completions.create(
+            model=OPENAI_MODEL,
+            messages=messages,
+            max_tokens=150
         )
-        result = response.choices[0].message['content']
-        return result
+        # Extract and return the assistant's reply
+        return response.choices[0].message.content
     except Exception as e:
-        print("Error in API call:", e)
-        return "Error in processing your request. Please try again later."
+        print(f"Error in OpenAI API call: {e}")
+        return f"Error: {str(e)}"
 
-# Define the chat endpoint
+
+
+
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
-    user_message = data.get("message")
+    """Handle user messages and save chat to MongoDB."""
+    try:
+        data = request.json
+        user_id = data.get("user_id", "anonymous")
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
 
-    # Add user message to the message array
-    message_array.append({"role": "user", "content": user_message})
+        # Validate that the user_id exists in the users collection
+        if user_id != "anonymous":  # Skip validation for anonymous users
+            try:
+                user_obj_id = ObjectId(user_id)
+                if not users_collection.find_one({"_id": user_obj_id}):
+                    return jsonify({"error": "Invalid user ID"}), 400
+            except Exception:
+                return jsonify({"error": "Invalid user ID format"}), 400
+        
+        user_message = data.get("message")
+        is_new_chat = data.get("is_new_chat", True)
 
-    # Call the API
-    response = api_call(message_array)
+        if not user_message:
+            return jsonify({"error": "Message is required"}), 400
 
-    # Add assistant's response to the message array
-    if response:
-        message_array.append({"role": "assistant", "content": response})
+        # Generate OpenAI response
+        assistant_reply = call_openai([
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": user_message}
+        ])
 
-    # Return the response to the frontend
-    return jsonify({"response": response})
+        # If it's a new chat, create a new document
+        if is_new_chat:
+            summary = call_openai([
+                {"role": "system", "content": "Summarize this conversation in one sentence."},
+                {"role": "user", "content": user_message},
+                {"role": "assistant", "content": assistant_reply}
+            ])
+            chat_doc = {
+                "user_id": user_id,
+                "chat_name": summary or "Untitled Chat",
+                "messages": [
+                    {"role": "user", "content": user_message},
+                    {"role": "assistant", "content": assistant_reply}
+                ],
+                "summary": summary,
+                "created_at": datetime.datetime.utcnow()
+            }
+            result = chats_collection.insert_one(chat_doc)
+            return jsonify({"assistant_reply": assistant_reply, "chat_id": str(result.inserted_id)}), 200
+
+        # If it's an existing chat, append to the existing document
+        chat_id = data.get("chat_id")
+        if not chat_id:
+            return jsonify({"error": "Chat ID is required for existing chats"}), 400
+
+        chats_collection.update_one(
+            {"_id": ObjectId(chat_id)},
+            {"$push": {"messages": {"role": "user", "content": user_message}}},
+        )
+        return jsonify({"assistant_reply": assistant_reply}), 200
+
+    except Exception as e:
+        print(f"Error in /api/chat: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/chats', methods=['GET'])
+def get_chats():
+    """Fetch all chats for a user."""
+    try:
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Fetch chats for the user
+        chats = chats_collection.find({"user_id": user_id}, {"messages": 0})  # Exclude full messages for performance
+        chat_list = [{"_id": str(chat["_id"]), "chat_name": chat["chat_name"], "summary": chat["summary"]} for chat in chats]
+
+        return jsonify(chat_list), 200
+    except Exception as e:
+        print(f"Error in /api/chats: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    data = request.json
-    existing_user = users.find_one({"email": data['email']})
-    if existing_user:
-        return jsonify({"error": "User already exists"}), 400
-    user_id = users.insert_one({
-        "email": data['email'],
-        "password": data['password'],  # Hash this in production
-        "favourites": [],
-        "settings": {},
-    }).inserted_id
-    return jsonify({"message": "User registered", "user_id": str(user_id)})
+    """Register a new user with hashed password."""
+    try:
+        data = request.json
+        email = data.get("email")
+        password = data.get("password")
+
+        if not email or not password:
+            return jsonify({"error": "Email and password are required"}), 400
+
+        # Check if user already exists
+        if users_collection.find_one({"email": email}):
+            return jsonify({"error": "User already exists"}), 400
+
+        # Hash the password
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Insert user into database
+        user = {
+            "email": email,
+            "password": hashed_password,
+            "created_at": datetime.datetime.utcnow()
+        }
+        user_id = users_collection.insert_one(user).inserted_id
+
+        return jsonify({"message": "User registered", "user_id": str(user_id)}), 201
+    except Exception as e:
+        print(f"Error in /api/register: {str(e)}")
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data = request.json
-    user = users.find_one({"email": data['email'], "password": data['password']})
-    if not user:
-        return jsonify({"error": "Invalid credentials"}), 401
-    return jsonify({"message": "Login successful", "user_id": str(user['_id'])})
+    """Authenticate user and return JWT token."""
+    try:
+        data = request.json
+        email = data.get("email")
+        password = data.get("password")
 
-@app.route('/api/save-chat', methods=['POST'])
-def save_chat():
-    data = request.json
-    chat_id = chats.insert_one({
-        "user_id": data['user_id'],
-        "messages": data['messages'],
-        "date": data['date']
-    }).inserted_id
-    return jsonify({"message": "Chat saved", "chat_id": str(chat_id)})
+        # Find user by email
+        user = users_collection.find_one({"email": email})
+        if not user:
+            return jsonify({"error": "Invalid credentials"}), 401
 
-@app.route('/api/get-chats-by-date', methods=['GET'])
-def get_chats_by_date():
-    user_id = request.args.get('user_id')
-    date = request.args.get('date')
-    user_chats = list(chats.find({"user_id": user_id, "date": date}))
-    for chat in user_chats:
-        chat['_id'] = str(chat['_id'])  # Convert ObjectId to string
-    return jsonify({"chats": user_chats})
+        # Verify password
+        if not bcrypt.checkpw(password.encode('utf-8'), user["password"]):
+            return jsonify({"error": "Invalid credentials"}), 401
 
-# Run the Flask app
+        # Create JWT token
+        access_token = create_access_token(identity=str(user["_id"]))
+
+        return jsonify({
+            "message": "Login successful",
+            "token": access_token,
+            "user_id": str(user["_id"])
+        }), 200
+    except Exception as e:
+        print(f"Error in /api/login: {str(e)}")
+        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+    
+@app.route('/api/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    """Test protected route."""
+    return jsonify({"message": "You have access to this protected route!"}), 200
+
+
+@app.route('/test-db', methods=['GET'])
+def test_db():
+    """Verify MongoDB connection."""
+    try:
+        mongo.db.command("ping")
+        return jsonify({"message": "MongoDB connection successful!"}), 200
+    except Exception as e:
+        print(f"Error testing DB connection: {str(e)}")  # Debugging log
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/test-env', methods=['GET'])
+def test_env():
+    """Check if environment variables are loaded."""
+    return jsonify({
+        "OPENAI_KEY_loaded": bool(OPENAI_KEY),
+        "OPENAI_MODEL": OPENAI_MODEL,
+        "MONGO_URI": MONGO_URI,
+    }), 200
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    return {"message": "Backend is working!"}
+
+
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)

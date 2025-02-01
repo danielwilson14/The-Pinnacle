@@ -8,9 +8,8 @@ services:
     environment:
       - FLASK_ENV=development
       - OPENAI_KEY=${OPENAI_KEY}
-      - ORG_ID=${ORG_ID}
-      - OPENAI_4O=${OPENAI_4O}
-      - MONGO_URI=mongodb://mongo:27017/talktoai
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      - MONGO_URI=mongodb+srv://danielwilson5525:Dissertation123@cluster1.d0wmq.mongodb.net/talktomeAI?retryWrites=true&w=majority
     depends_on:
       - mongo
 

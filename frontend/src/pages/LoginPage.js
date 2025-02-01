@@ -15,12 +15,12 @@ function LoginPage() {
                 email,
                 password,
             });
-            const userId = response.data.user_id;
-
-            // Save userId to local storage
-            localStorage.setItem("userId", userId);
-
-            // Navigate to the chat page
+    
+            // Store JWT Token & User ID
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("userId", response.data.user_id);
+    
+            // Navigate to chat
             navigate("/chat");
         } catch (err) {
             setError("Invalid credentials");
