@@ -59,20 +59,9 @@ def chat():
     try:
         data = request.json
         user_id = data.get("user_id", "anonymous")
-        if not user_id:
-            return jsonify({"error": "User ID is required"}), 400
-
-        # Validate that the user_id exists in the users collection
-        if user_id != "anonymous":  # Skip validation for anonymous users
-            try:
-                user_obj_id = ObjectId(user_id)
-                if not users_collection.find_one({"_id": user_obj_id}):
-                    return jsonify({"error": "Invalid user ID"}), 400
-            except Exception:
-                return jsonify({"error": "Invalid user ID format"}), 400
-        
         user_message = data.get("message")
-        is_new_chat = data.get("is_new_chat", True)
+        chat_id = data.get("chat_id")  # Use existing chat_id if provided
+        is_new_chat = not chat_id  # If chat_id is not provided, treat it as a new chat
 
         if not user_message:
             return jsonify({"error": "Message is required"}), 400
@@ -80,43 +69,60 @@ def chat():
         # Generate OpenAI response
         assistant_reply = call_openai([
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": user_message}
+            {"role": "user", "content": user_message},
         ])
 
-        # If it's a new chat, create a new document
         if is_new_chat:
+            # Create a new chat document in the database
             summary = call_openai([
                 {"role": "system", "content": "Summarize this conversation in one sentence."},
                 {"role": "user", "content": user_message},
-                {"role": "assistant", "content": assistant_reply}
+                {"role": "assistant", "content": assistant_reply},
             ])
             chat_doc = {
                 "user_id": user_id,
                 "chat_name": summary or "Untitled Chat",
                 "messages": [
                     {"role": "user", "content": user_message},
-                    {"role": "assistant", "content": assistant_reply}
+                    {"role": "assistant", "content": assistant_reply},
                 ],
                 "summary": summary,
-                "created_at": datetime.datetime.utcnow()
+                "created_at": datetime.datetime.utcnow(),
             }
             result = chats_collection.insert_one(chat_doc)
-            return jsonify({"assistant_reply": assistant_reply, "chat_id": str(result.inserted_id)}), 200
+            return jsonify({
+                "assistant_reply": assistant_reply,
+                "chat_id": str(result.inserted_id)
+            }), 200
+        else:
+            # Append to the existing chat document
+            chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
+            if not chat:
+                return jsonify({"error": "Chat not found"}), 404
 
-        # If it's an existing chat, append to the existing document
-        chat_id = data.get("chat_id")
-        if not chat_id:
-            return jsonify({"error": "Chat ID is required for existing chats"}), 400
+            # Push the user's message
+            chats_collection.update_one(
+                {"_id": ObjectId(chat_id)},
+                {"$push": {"messages": {"role": "user", "content": user_message}}}
+            )
 
-        chats_collection.update_one(
-            {"_id": ObjectId(chat_id)},
-            {"$push": {"messages": {"role": "user", "content": user_message}}},
-        )
-        return jsonify({"assistant_reply": assistant_reply}), 200
+            # Push the assistant's reply
+            chats_collection.update_one(
+                {"_id": ObjectId(chat_id)},
+                {"$push": {"messages": {"role": "assistant", "content": assistant_reply}}}
+            )
+
+            return jsonify({"assistant_reply": assistant_reply, "chat_id": chat_id}), 200
 
     except Exception as e:
         print(f"Error in /api/chat: {e}")
         return jsonify({"error": "Internal server error"}), 500
+
+
+    except Exception as e:
+        print(f"Error in /api/chat: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route('/api/chats', methods=['GET'])
 def get_chats():
@@ -133,6 +139,22 @@ def get_chats():
         return jsonify(chat_list), 200
     except Exception as e:
         print(f"Error in /api/chats: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/chats/<chat_id>', methods=['GET'])
+def get_chat(chat_id):
+    """Fetch a specific chat by ID."""
+    try:
+        chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
+        if not chat:
+            return jsonify({"error": "Chat not found"}), 404
+
+        # Convert ObjectId to string for the frontend
+        chat["_id"] = str(chat["_id"])
+
+        return jsonify(chat), 200
+    except Exception as e:
+        print(f"Error in /api/chats/<chat_id>: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 

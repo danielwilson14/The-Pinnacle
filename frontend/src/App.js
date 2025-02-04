@@ -17,6 +17,7 @@ function App() {
                     <Route path="/favourites" element={<FavouritesPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/previous-chats" element={<PreviousChats />} />
+                    <Route path="/chat/:chatId" element={<ChatPage />} />
                 </Routes>
             </Layout>
         </Router>
