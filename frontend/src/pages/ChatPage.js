@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatBot from "../components/ChatBot";
+import Navbar from "../components/Navbar"; // Import Navbar
 import Modal from "react-modal";
 
 Modal.setAppElement("#root");
@@ -10,7 +11,7 @@ function ChatPage() {
     const { chatId: routeChatId } = useParams(); // Get chatId from the route
     const [chatId, setChatId] = useState(routeChatId || null); // Track chatId state
     const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([]); // Track chat messages
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -31,6 +32,9 @@ function ChatPage() {
                 } catch (error) {
                     console.error("Error fetching chat:", error);
                 }
+            } else {
+                // Reset messages when starting a new chat
+                setMessages([]);
             }
         };
 
@@ -63,6 +67,7 @@ function ChatPage() {
             // If it's a new chat, set the chatId
             if (!chatId) {
                 setChatId(res.data.chat_id);
+                navigate(`/chat/${res.data.chat_id}`);
             }
 
             setMessages([
@@ -84,6 +89,8 @@ function ChatPage() {
 
     return (
         <div style={styles.pageContainer}>
+            {/* Pass setChatId and setMessages to Navbar */}
+            <Navbar setChatId={setChatId} setMessages={setMessages} />
             <div style={styles.chatContainer}>
                 <ChatBot
                     messages={messages}
@@ -120,7 +127,7 @@ const styles = {
         backgroundColor: "#f4f4f4",
     },
     chatContainer: {
-        width: "80%",
+        width: "100%",
         padding: "20px",
     },
     modalButtons: {

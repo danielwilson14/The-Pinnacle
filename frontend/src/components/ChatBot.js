@@ -29,6 +29,12 @@ function ChatBot({ messages, message, setMessage, sendMessage }) {
                         setMessage(e.target.value);
                         console.log("Input updated to:", e.target.value); // Debug log for input changes
                     }}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") { 
+                            e.preventDefault(); 
+                            sendMessage(); 
+                        }
+                    }}
                     placeholder="Type your message"
                     style={styles.input}
                 />
@@ -64,6 +70,8 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
+        alignItems: 'stretch', // Ensures proper alignment
+
     },
     messageText: {
         margin: 0,
@@ -78,6 +86,7 @@ const styles = {
     inputContainer: {
         display: 'flex',
         gap: '10px',
+        marginBottom: '20px',
     },
     input: {
         flexGrow: 1,

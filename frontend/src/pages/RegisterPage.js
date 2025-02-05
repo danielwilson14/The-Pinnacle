@@ -88,8 +88,13 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
+        width: '100vw', 
         backgroundColor: '#f4f4f4',
+        margin: 0, 
+        padding: 0, 
+        position: 'relative', 
     },
+    
     formContainer: {
         backgroundColor: '#d7ede2',
         padding: '40px',
