@@ -132,14 +132,84 @@ def get_chats():
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
 
+        # Debugging log to confirm user_id
+        print(f"Fetching chats for user_id: {user_id}")
+
         # Fetch chats for the user
         chats = chats_collection.find({"user_id": user_id}, {"messages": 0})  # Exclude full messages for performance
-        chat_list = [{"_id": str(chat["_id"]), "chat_name": chat["chat_name"], "summary": chat["summary"]} for chat in chats]
+
+        # Debugging log to confirm fetched chats
+        chat_list = [
+            {
+                "_id": str(chat["_id"]),
+                "chat_name": chat.get("chat_name", "Untitled"),
+                "summary": chat.get("summary", ""),
+            }
+            for chat in chats
+        ]
+        print(f"Fetched chat list: {chat_list}")
 
         return jsonify(chat_list), 200
     except Exception as e:
-        print(f"Error in /api/chats: {e}")
+        print(f"Error in /api/chats: {e}")  # Detailed error logging
         return jsonify({"error": "Internal server error"}), 500
+    
+@app.route('/api/chats/<chat_id>', methods=['DELETE'])
+def delete_chat(chat_id):
+    """Delete a specific chat by ID."""
+    try:
+        chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
+        if not chat:
+            return jsonify({"error": "Chat not found"}), 404
+
+        chats_collection.delete_one({"_id": ObjectId(chat_id)})
+        return jsonify({"message": "Chat deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error in /api/chats/<chat_id>: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@app.route('/api/calendar', methods=['GET'])
+def get_calendar_chats():
+    """
+    Fetch all dates when a user had chats, along with chat summaries for each date.
+    """
+    try:
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Debugging log to confirm user_id
+        print(f"Fetching calendar data for user_id: {user_id}")
+
+        # Fetch chats for the user, include created_at and summary fields
+        chats = chats_collection.find(
+            {"user_id": user_id},
+            {"created_at": 1, "summary": 1}
+        )
+
+        # Create a dictionary to group chats by date
+        calendar_data = {}
+        for chat in chats:
+            chat_date = chat["created_at"].date()  # Get the date part
+            chat_date_str = chat_date.isoformat()  # Convert to string for JSON
+
+            if chat_date_str not in calendar_data:
+                calendar_data[chat_date_str] = []
+
+            calendar_data[chat_date_str].append({
+                "_id": str(chat["_id"]),
+                "summary": chat.get("summary", "No summary available"),
+            })
+
+        # Debugging log for calendar data
+        print(f"Fetched calendar data: {calendar_data}")
+
+        return jsonify(calendar_data), 200
+    except Exception as e:
+        print(f"Error in /api/calendar: {e}")  # Detailed error logging
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route('/api/chats/<chat_id>', methods=['GET'])
 def get_chat(chat_id):
@@ -244,6 +314,7 @@ def test_env():
         "OPENAI_MODEL": OPENAI_MODEL,
         "MONGO_URI": MONGO_URI,
     }), 200
+
 
 
 @app.route('/test', methods=['GET'])
