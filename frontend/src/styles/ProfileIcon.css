@@ -1,0 +1,19 @@
+.profile-icon-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    cursor: pointer;
+  }
+  
+  .profile-icon {
+    font-size: 36px;
+    color: #333;
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+  
+  .profile-icon:hover {
+    transform: scale(1.2);
+    color: #6abf69;
+  }
+  

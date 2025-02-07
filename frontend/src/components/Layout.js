@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from './Navbar';
+import ProfileIcon from './ProfileIcon';
 import { useLocation } from 'react-router-dom';
 
 function Layout({ children }) {
@@ -9,6 +10,7 @@ function Layout({ children }) {
     return (
         <div style={styles.layout}>
             {!hideNavbar && <Navbar />} {/* Only show Navbar on certain pages */}
+            {!hideNavbar && <ProfileIcon />} {/* Show ProfileIcon on pages with Navbar */}
             <div
                 style={{
                     ...styles.content,
