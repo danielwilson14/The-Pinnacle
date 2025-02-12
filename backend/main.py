@@ -321,6 +321,59 @@ def test_env():
 def test():
     return {"message": "Backend is working!"}
 
+@app.route('/api/user', methods=['GET'])
+def get_user():
+    """Fetch user profile information."""
+    try:
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Return user data (excluding password for security)
+        return jsonify({
+            "display_name": user.get("display_name", ""),
+            "email": user["email"],
+            "profile_pic": user.get("profile_pic", ""),
+            "dob": user.get("dob", ""),
+            "location": user.get("location", ""),
+            "pronouns": user.get("pronouns", ""),
+            "created_at": user["created_at"].isoformat()
+        }), 200
+    except Exception as e:
+        print(f"Error in /api/user: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@app.route('/api/user/update', methods=['POST'])
+def update_user():
+    """Update user profile information."""
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        update_fields = {
+            "display_name": data.get("display_name", ""),
+            "profile_pic": data.get("profile_pic", ""),
+            "dob": data.get("dob", ""),
+            "location": data.get("location", ""),
+            "pronouns": data.get("pronouns", "")
+        }
+
+        users_collection.update_one({"_id": ObjectId(user_id)}, {"$set": update_fields})
+
+        return jsonify({"message": "Profile updated successfully"}), 200
+    except Exception as e:
+        print(f"Error in /api/user/update: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import "../styles/Navbar.css"; // Import the new CSS file
 
 function Navbar({ setChatId, setMessages }) {
     const location = useLocation();
@@ -9,15 +10,15 @@ function Navbar({ setChatId, setMessages }) {
 
     const handleNewChat = () => {
         if (location.pathname !== "/chat") {
-            navigate("/chat"); // Navigate to the new chat page
+            navigate("/chat");
         }
-        setChatId(null); // Clear the chatId state
-        setMessages([]); // Clear the messages from the chat
+        setChatId(null);
+        setMessages([]);
     };
 
     const handleLogout = () => {
-        localStorage.clear(); // Clear localStorage data
-        navigate("/"); // Navigate to login page
+        localStorage.clear();
+        navigate("/");
     };
 
     if (hideNavbar) {
@@ -25,36 +26,14 @@ function Navbar({ setChatId, setMessages }) {
     }
 
     return (
-        <nav style={styles.navbar}>
-            <button onClick={handleLogout} style={styles.link}>Logout</button>
-            <button onClick={handleNewChat} style={styles.link}>New Chat</button>
-            <Link to="/favourites" style={styles.link}>Favourites</Link>
-            <Link to="/calendar" style={styles.link}>Calendar</Link>
-            <Link to="/previous-chats" style={styles.link}>Previous Chats</Link>
+        <nav className="navbar">
+            <button onClick={handleLogout}>Logout</button>
+            <button onClick={handleNewChat}>New Chat</button>
+            <Link to="/favourites">Favourites</Link>
+            <Link to="/calendar">Calendar</Link>
+            <Link to="/previous-chats">Previous Chats</Link>
         </nav>
     );
 }
-
-const styles = {
-    navbar: {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100%",
-        width: "200px",
-        backgroundColor: "#ddd",
-        display: "flex",
-        flexDirection: "column",
-        padding: "10px",
-        boxShadow: "2px 0 5px rgba(0,0,0,0.1)",
-    },
-    link: {
-        margin: "10px 0",
-        textDecoration: "none",
-        color: "#000",
-        fontSize: "18px",
-        cursor: "pointer",
-    },
-};
 
 export default Navbar;

@@ -14,7 +14,7 @@ const CalendarPage = () => {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/calendar`, {
           params: { user_id: localStorage.getItem("userId") },
         });
-        setChatsByDate(response.data); // Backend returns { "2025-02-06": [...chats], ... }
+        setChatsByDate(response.data);
       } catch (error) {
         console.error("Error fetching calendar data:", error);
       }
@@ -22,6 +22,16 @@ const CalendarPage = () => {
 
     fetchChats();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showPopup && !event.target.closest(".calendar-popup")) {
+        setShowPopup(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showPopup]);
 
   const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
 
@@ -31,7 +41,6 @@ const CalendarPage = () => {
     const totalDays = daysInMonth(month, year);
     const prevMonthDays = daysInMonth(month - 1, year);
 
-    // Add gray days for previous month
     for (let i = 0; i < firstDay; i++) {
       days.push(
         <div key={`prev-${i}`} className="day gray">
@@ -40,7 +49,6 @@ const CalendarPage = () => {
       );
     }
 
-    // Add days for the current month
     for (let day = 1; day <= totalDays; day++) {
       const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       const hasChats = chatsByDate[date];
@@ -55,7 +63,6 @@ const CalendarPage = () => {
       );
     }
 
-    // Add gray days for next month
     const totalCells = days.length % 7 === 0 ? days.length : days.length + (7 - (days.length % 7));
     for (let i = days.length; i < totalCells; i++) {
       days.push(
@@ -81,7 +88,7 @@ const CalendarPage = () => {
   };
 
   return (
-    <div className="calendar-page">
+    <div className="calendar-wrapper">
       {[...Array(12)].map((_, index) => {
         const month = index + 1;
         const year = new Date().getFullYear();
@@ -94,8 +101,8 @@ const CalendarPage = () => {
       })}
 
       {showPopup && (
-        <div className="popup-overlay" onClick={closePopup}>
-          <div className="popup" onClick={(e) => e.stopPropagation()}>
+        <div className="calendar-popup-overlay" onClick={closePopup}>
+          <div className="calendar-popup" onClick={(e) => e.stopPropagation()}>
             <h4>Chats on {selectedDate}</h4>
             {selectedChats.length > 0 ? (
               <ul className="chat-list">

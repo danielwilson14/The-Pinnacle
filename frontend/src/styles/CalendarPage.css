@@ -3,12 +3,37 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f9f9f9;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Dark Mode */
+.dark-mode body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* Ensure the main padded area also follows dark mode */
+.calendar-wrapper {
+  flex: 1 1 0%;
+  padding: 20px;
+  background-color: #f4f4f4;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .calendar-wrapper {
+  background-color: #1e1e1e !important;
+}
+
+/* Calendar container */
 .calendar-page {
   padding: 20px;
 }
 
+.dark-mode .calendar-page {
+  background-color: #1e1e1e;
+}
+
+/* Month box */
 .month {
   margin-bottom: 20px;
   padding: 10px;
@@ -18,18 +43,30 @@ body {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.dark-mode .month {
+  background-color: #222;
+  border: 1px solid #444;
+  box-shadow: 0px 4px 6px rgba(255, 255, 255, 0.1);
+}
+
 .month h3 {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 10px;
 }
 
+.dark-mode .month h3 {
+  color: #ffffff;
+}
+
+/* Calendar grid */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
 }
 
+/* Calendar day boxes */
 .day {
   display: flex;
   justify-content: center;
@@ -58,70 +95,53 @@ body {
   cursor: default;
 }
 
+.dark-mode .day.gray {
+  background-color: #333;
+  color: #888;
+}
+
 .day:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.popup {
+/* Popup styling */
+.calendar-popup {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 400px;
+  width: 500px !important; 
+  max-width: 90vw; 
   max-height: 70vh;
   overflow-y: auto;
   animation: popup-slide-in 0.3s ease-out;
 }
 
-.popup h4 {
+.dark-mode .calendar-popup {
+  background-color: #222;
+  color: white;
+  border: 1px solid #444;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.calendar-popup h4 {
   font-size: 18px;
   margin-bottom: 10px;
 }
 
-.popup .chat-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.dark-mode .calendar-popup h4 {
+  color: white;
 }
 
-.popup .chat-item {
+.calendar-popup .chat-item {
   padding: 10px;
   background-color: #f4f4f4;
   margin-bottom: 10px;
   border-radius: 8px;
 }
 
-.popup .close-button {
-  margin-top: 15px;
-  padding: 8px 15px;
-  background-color: #d32f2f;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-@keyframes popup-slide-in {
-  from {
-    transform: translateY(-20%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.dark-mode .calendar-popup .chat-item {
+  background-color: #333;
+  color: white;
 }

@@ -1,18 +1,17 @@
 .App {
   text-align: center;
+  background-color: #f4f4f4; /* Light mode default */
+  color: black;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Dark Mode */
+.dark-mode .App {
+  background-color: #121212 !important;
+  color: white !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
+/* App Header */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -22,12 +21,65 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+.dark-mode .App-header {
+  background-color: #1e1e1e;
+}
+
+/* Navbar should also respect dark mode */
+.navbar {
+  background-color: #ddd;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .navbar {
+  background-color: #222;
+}
+
+/* Profile Icon container */
+.profile-icon-container {
+  position: fixed;
+  top: 20px;
+  right: 40px;
+  z-index: 2000;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .profile-icon-container {
+  background-color: rgba(50, 50, 50, 0.8);
+}
+
+/* Fix links */
 .App-link {
   color: #61dafb;
 }
 
+.dark-mode .App-link {
+  color: #4fa3d1;
+}
+
+/* Fix for content spacing */
+.content-container {
+  display: flex;
+  width: 100%;
+}
+
+.content {
+  flex-grow: 1; /* Takes up remaining space */
+  min-width: 0;
+  padding: 20px;
+}
+
+
+/* Loading animation */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

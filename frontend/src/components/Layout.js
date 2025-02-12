@@ -1,20 +1,30 @@
-import React from 'react';
-import Navbar from './Navbar';
-import ProfileIcon from './ProfileIcon';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import Navbar from "./Navbar";
+import ProfileIcon from "./ProfileIcon";
+import { useLocation } from "react-router-dom";
 
-function Layout({ children }) {
+function Layout({ children, isDarkMode, setIsDarkMode }) {
     const location = useLocation();
-    const hideNavbar = location.pathname === '/' || location.pathname === '/register';
+    const hideNavbar = location.pathname === "/" || location.pathname === "/register";
 
     return (
-        <div style={styles.layout}>
-            {!hideNavbar && <Navbar />} {/* Only show Navbar on certain pages */}
-            {!hideNavbar && <ProfileIcon />} {/* Show ProfileIcon on pages with Navbar */}
+        <div className={`layout ${isDarkMode ? "dark-mode" : ""}`} style={{ display: "flex", height: "100vh" }}>
+            {!hideNavbar && <Navbar />}
+            {!hideNavbar && <ProfileIcon isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />}
+            
+            {/* Fixing white strip issue by removing padding/margin and ensuring background color applies instantly */}
             <div
+                className="content"
                 style={{
-                    ...styles.content,
-                    marginLeft: hideNavbar ? '0' : '200px', // Remove margin when Navbar is hidden
+                    marginLeft: hideNavbar ? "0" : "200px",
+                    backgroundColor: isDarkMode ? "#121212" : "#f4f4f4",
+                    color: isDarkMode ? "white" : "black",
+                    width: "100%",
+                    height: "100vh",
+                    padding: "0",
+                    display: "flex",
+                    flexDirection: "column",
+                    transition: "background-color 0.3s ease, color 0.3s ease",
                 }}
             >
                 {children}
@@ -22,18 +32,5 @@ function Layout({ children }) {
         </div>
     );
 }
-
-const styles = {
-    layout: {
-        display: 'flex',
-        height: '100vh',
-    },
-    content: {
-        flex: 1, // Ensures the content takes the remaining space
-        padding: '20px',
-        overflowY: 'auto', // Enables scrolling for content if needed
-        backgroundColor: '#f4f4f4',
-    },
-};
 
 export default Layout;

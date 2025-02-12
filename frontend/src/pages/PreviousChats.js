@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/PreviousChats.css";
 
-function PreviousChats() {
+function PreviousChats({ isDarkMode }) {
   const [chats, setChats] = useState([]);
   const navigate = useNavigate();
 
@@ -38,29 +38,23 @@ function PreviousChats() {
     }
   };
 
-  const truncateSummary = (summary, maxLength = 50) => {
-    if (!summary) return "No summary available.";
-    return summary.length > maxLength ? `${summary.substring(0, maxLength)}...` : summary;
-  };
-
   return (
-    <div className="previous-chats-container">
-      <h2 className="heading">Previous Chats</h2>
-      <div className="chat-list">
-        {chats.map((chat) => (
-          <div key={chat._id} className="chat-card">
-            <div className="chat-info" onClick={() => handleChatClick(chat._id)}>
-              <h3 className="chat-title">{chat.chat_name || "Untitled Chat"}</h3>
-              <p className="chat-summary">{truncateSummary(chat.summary)}</p>
+    <div className={`previous-chats-wrapper ${isDarkMode ? "dark-mode" : ""}`}>
+      <div className="previous-chats-container">
+        <h2 className="heading">Previous Chats</h2>
+        <div className="chat-list">
+          {chats.map((chat) => (
+            <div key={chat._id} className="chat-card">
+              <div className="chat-info" onClick={() => handleChatClick(chat._id)}>
+                <h3 className="chat-title">{chat.chat_name || "Untitled Chat"}</h3>
+                <p className="chat-summary">{chat.summary || "No summary available."}</p>
+              </div>
+              <button className="delete-button" onClick={() => handleDeleteChat(chat._id)}>
+                Delete
+              </button>
             </div>
-            <button
-              className="delete-button"
-              onClick={() => handleDeleteChat(chat._id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
