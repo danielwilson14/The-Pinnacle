@@ -23,6 +23,7 @@ const CalendarPage = () => {
     fetchChats();
   }, []);
 
+  // Handle outside click to close the popup
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showPopup && !event.target.closest(".calendar-popup")) {
@@ -76,11 +77,18 @@ const CalendarPage = () => {
   };
 
   const handleDayClick = (date) => {
+    console.log("Clicked Date:", date);
+    console.log("Chats on this date:", chatsByDate[date]);
+
     setSelectedDate(date);
     setSelectedChats(chatsByDate[date] || []);
-    setShowPopup(true);
+    
+    setTimeout(() => { // 🔹 Force React to update
+      setShowPopup(true);
+    }, 50);
   };
 
+  // 🔹 **Fix: Define `closePopup`**
   const closePopup = () => {
     setShowPopup(false);
     setSelectedDate(null);
@@ -100,8 +108,9 @@ const CalendarPage = () => {
         );
       })}
 
+      {/* Move popup to the very end to avoid nesting issues */}
       {showPopup && (
-        <div className="calendar-popup-overlay" onClick={closePopup}>
+        <div className="calendar-popup-overlay active" onClick={closePopup}>
           <div className="calendar-popup" onClick={(e) => e.stopPropagation()}>
             <h4>Chats on {selectedDate}</h4>
             {selectedChats.length > 0 ? (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { FaHeart, FaRegHeart } from "react-icons/fa"; // Import Heart Icons
 import "../styles/PreviousChats.css";
 
 function PreviousChats({ isDarkMode }) {
@@ -38,6 +39,21 @@ function PreviousChats({ isDarkMode }) {
     }
   };
 
+  const handleToggleFavourite = async (chatId, isFavourited) => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/favourites/toggle`, {
+        chat_id: chatId,
+      });
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat._id === chatId ? { ...chat, favourited: !isFavourited } : chat
+        )
+      );
+    } catch (error) {
+      console.error("Error toggling favourite status:", error);
+    }
+  };
+
   return (
     <div className={`previous-chats-wrapper ${isDarkMode ? "dark-mode" : ""}`}>
       <div className="previous-chats-container">
@@ -49,9 +65,14 @@ function PreviousChats({ isDarkMode }) {
                 <h3 className="chat-title">{chat.chat_name || "Untitled Chat"}</h3>
                 <p className="chat-summary">{chat.summary || "No summary available."}</p>
               </div>
-              <button className="delete-button" onClick={() => handleDeleteChat(chat._id)}>
-                Delete
-              </button>
+              <div className="chat-actions">
+                <button className="favourite-button" onClick={() => handleToggleFavourite(chat._id, chat.favourited)}>
+                  {chat.favourited ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                </button>
+                <button className="delete-button" onClick={() => handleDeleteChat(chat._id)}>
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>

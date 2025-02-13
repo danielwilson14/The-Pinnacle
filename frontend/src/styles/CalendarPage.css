@@ -106,13 +106,36 @@ body {
 }
 
 /* Popup styling */
+.calendar-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Ensure overlay appears */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Ensure popup appears when `showPopup` is true */
+.calendar-popup-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Popup Box */
 .calendar-popup {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 500px !important; 
-  max-width: 90vw; 
+  width: 500px;
+  max-width: 90vw;
   max-height: 70vh;
   overflow-y: auto;
   animation: popup-slide-in 0.3s ease-out;
@@ -144,4 +167,31 @@ body {
 .dark-mode .calendar-popup .chat-item {
   background-color: #333;
   color: white;
+}
+
+/* Close button */
+.close-button {
+  margin-top: 15px;
+  padding: 8px 15px;
+  background-color: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #b71c1c;
+}
+
+/* Animation for smooth appearance */
+@keyframes popup-slide-in {
+  from {
+    transform: translateY(-20%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }

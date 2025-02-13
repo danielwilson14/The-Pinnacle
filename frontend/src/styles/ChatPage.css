@@ -1,0 +1,147 @@
+/* ✅ General Page Styling */
+body, html {
+    background-color: #2a2a2a; /* ✅ Ensures no pitch black background */
+    margin: 0;
+    padding: 0;
+}
+
+.chat-page-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f4f4f4;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow: hidden; /* ✅ Prevents unnecessary scrollbars */
+}
+
+.dark-mode .chat-page-container {
+    background-color: #2a2a2a;
+}
+
+/* ✅ Chat Container */
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 10px;
+    max-width: calc(100vw - 280px); /* ✅ Takes full width except space for navbar & icon */
+    margin: 20px auto;
+    padding: 20px;
+    height: calc(100vh - 60px); /* ✅ Adjust height to fit viewport */
+    overflow: hidden; /* ✅ Prevents outer scrollbars */
+}
+
+.dark-mode .chat-container {
+    background-color: #2a2a2a;
+}
+
+/* ✅ Messages Container - The only scrollable area */
+.messages-container {
+    flex: 1;
+    overflow-y: auto; /* ✅ Only this section should scroll */
+    overflow-x: hidden; /* ✅ Prevent horizontal scrolling */
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin; /* ✅ For consistent scroll behavior */
+}
+
+.dark-mode .messages-container {
+    background-color: #2a2a2a;
+}
+
+/* ✅ Message Bubbles */
+.message-bubble {
+    max-width: 70%;
+    padding: 12px;
+    border-radius: 15px;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* ✅ User Messages */
+.message-bubble.user {
+    background-color: #d1f7c4;
+    align-self: flex-end;
+    color: black;
+}
+
+.dark-mode .message-bubble.user {
+    background-color: #d1f7c4;
+    color: black;
+}
+
+/* ✅ Bot Messages */
+.message-bubble.bot {
+    background-color: #f4f4f4;
+    align-self: flex-start;
+    color: black;
+}
+
+.dark-mode .message-bubble.bot {
+    background-color: #f4f4f4;
+    color: black;
+}
+
+/* ✅ Input Area */
+.input-container {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    background-color: white;
+    border-radius: 8px;
+    border-top: 1px solid #ddd;
+}
+
+.dark-mode .input-container {
+    background-color: #222;
+}
+
+/* ✅ Input Box */
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 16px;
+}
+
+.dark-mode .chat-input {
+    background-color: #333;
+    border: 1px solid #555;
+    color: white;
+}
+
+/* ✅ Send Button */
+.send-button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background-color: #45a049;
+}
+
+/* ✅ Fix Profile Icon Overlapping */
+.profile-icon-container {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 50%;
+}
+
+.dark-mode .profile-icon-container {
+    background-color: rgba(0, 0, 0, 0.6);
+}

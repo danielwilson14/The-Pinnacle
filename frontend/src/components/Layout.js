@@ -17,7 +17,7 @@ function Layout({ children, isDarkMode, setIsDarkMode }) {
                 className="content"
                 style={{
                     marginLeft: hideNavbar ? "0" : "200px",
-                    backgroundColor: isDarkMode ? "#121212" : "#f4f4f4",
+                    backgroundColor: isDarkMode ? "#121212" : "#2a2a2a",
                     color: isDarkMode ? "white" : "black",
                     width: "100%",
                     height: "100vh",

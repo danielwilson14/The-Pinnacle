@@ -374,6 +374,52 @@ def update_user():
         return jsonify({"error": "Internal server error"}), 500
 
 
+@app.route('/api/favourites/toggle', methods=['POST'])
+def toggle_favourite():
+    """Toggle a chat as a favourite or unfavourite."""
+    try:
+        data = request.json
+        chat_id = data.get("chat_id")
+        if not chat_id:
+            return jsonify({"error": "Chat ID is required"}), 400
+
+        chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
+        if not chat:
+            return jsonify({"error": "Chat not found"}), 404
+
+        # Toggle favourite field
+        new_fav_status = not chat.get("isFavourited", False)
+        chats_collection.update_one({"_id": ObjectId(chat_id)}, {"$set": {"isFavourited": new_fav_status}})
+
+        return jsonify({"message": "Favourite status updated", "isFavourited": new_fav_status}), 200
+    except Exception as e:
+        print(f"Error in /api/favourites/toggle: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/favourites', methods=['GET'])
+def get_favourites():
+    """Get all favourited chats for a user."""
+    try:
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        favourite_chats = chats_collection.find({"user_id": user_id, "isFavourited": True}, {"messages": 0})
+
+        chat_list = [
+            {
+                "_id": str(chat["_id"]),
+                "chat_name": chat.get("chat_name", "Untitled"),
+                "summary": chat.get("summary", ""),
+            }
+            for chat in favourite_chats
+        ]
+
+        return jsonify(chat_list), 200
+    except Exception as e:
+        print(f"Error in /api/favourites: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
 
