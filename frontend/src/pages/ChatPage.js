@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ChatBot from "../components/ChatBot";
 import Navbar from "../components/Navbar";
-import { FaHeart } from "react-icons/fa"; // ❤️ Import heart icon
+import { FaHeart, FaRegHeart } from "react-icons/fa"; 
 import "../styles/ChatPage.css";
 
 function ChatPage() {
@@ -11,7 +11,7 @@ function ChatPage() {
     const [chatId, setChatId] = useState(routeChatId || null);
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [isFavourited, setIsFavourited] = useState(false); // ✅ Tracks if chat is a favourite
+    const [isFavourited, setIsFavourited] = useState(false); 
     const navigate = useNavigate();
     const isDarkMode = localStorage.getItem("darkMode") === "true";
 
@@ -55,6 +55,17 @@ function ChatPage() {
             ]);
 
             setMessage("");
+
+            // 🚨 If message is serious, suggest help page
+        const seriousKeywords = ["suicide", "depressed", "self-harm", "hopeless"];
+        if (seriousKeywords.some(word => message.toLowerCase().includes(word))) {
+            const confirmRedirect = window.confirm(
+                "It sounds like you're going through something serious. Would you like to see professional help options?"
+            );
+            if (confirmRedirect) {
+                navigate("/professional-help");
+            }
+        }
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -73,12 +84,11 @@ function ChatPage() {
         <div className={`chat-page-container ${isDarkMode ? "dark-mode" : ""}`}>
             <Navbar />
             <div className="chat-container">
-                <ChatBot messages={messages} message={message} setMessage={setMessage} sendMessage={sendMessage} />
-                <div className="chat-actions">
-                    <button className={`heart-button ${isFavourited ? "favourited" : ""}`} onClick={toggleFavourite}>
-                        <FaHeart />
-                    </button>
-                </div>
+                <ChatBot 
+                    messages={messages} 
+                    isFavourited={isFavourited} 
+                    toggleFavourite={toggleFavourite}
+                />
             </div>
         </div>
     );

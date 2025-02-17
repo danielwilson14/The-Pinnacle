@@ -1,0 +1,97 @@
+/* 🌟 General Page Styling */
+.help-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .dark-mode .help-container {
+    background: #222;
+    color: white;
+  }
+  
+  /* 🏷️ Headings */
+  .help-container h1 {
+    font-size: 28px;
+    color: #333;
+  }
+  
+  .dark-mode .help-container h1 {
+    color: white;
+  }
+  
+  .help-container h2 {
+    font-size: 22px;
+    color: #444;
+  }
+  
+  .dark-mode .help-container h2 {
+    color: #ddd;
+  }
+  
+  /* 📜 Text */
+  .help-container p {
+    font-size: 16px;
+    color: #555;
+  }
+  
+  .dark-mode .help-container p {
+    color: #ccc;
+  }
+  
+  /* 📌 Sections */
+  .help-section {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: left;
+  }
+  
+  .dark-mode .help-section {
+    background-color: #333;
+  }
+  
+  .emergency {
+    background-color: #ffe5e5;
+    border-left: 5px solid #d32f2f;
+  }
+  
+  .dark-mode .emergency {
+    background-color: #550000;
+    color: white;
+  }
+  
+  /* 📞 Contact Information */
+  .help-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .help-container li {
+    font-size: 16px;
+    margin: 8px 0;
+  }
+  
+  /* 🔗 Links */
+  .help-container a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .help-container a:hover {
+    text-decoration: underline;
+  }
+  
+  /* 💙 Footer Message */
+  .help-footer {
+    font-size: 14px;
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 20px;
+  }
+  

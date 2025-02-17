@@ -97,6 +97,31 @@ const ProfileIcon = () => {
     alert("Redirect to change password page/modal.");
   };
 
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete your account? This action is irreversible."
+    );
+  
+    if (!confirmDelete) return;
+  
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/user/delete`, {
+        data: { user_id: userId }, // Send user ID in request body
+      });
+  
+      // Clear user session data
+      localStorage.removeItem("userId");
+      localStorage.removeItem("darkMode");
+  
+      alert("Your account has been deleted.");
+      window.location.href = "/register"; // Redirect to register page
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Failed to delete account. Please try again.");
+    }
+  };
+  
+
   const renderContent = () => {
     if (activeTab === "Profile") {
       return (
@@ -170,6 +195,12 @@ const ProfileIcon = () => {
             </button>
             <button className="action-button" onClick={handleToggleDarkMode}>
               {isDarkMode ? "Disable Dark Mode" : "Enable Dark Mode"}
+            </button>
+          </div>
+          <div className="delete-section">
+            <p className="warning">This action cannot be undone!</p>
+            <button className="delete-account-button" onClick={handleDeleteAccount}>
+              Delete My Account
             </button>
           </div>
         </div>

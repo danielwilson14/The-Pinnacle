@@ -10,19 +10,30 @@ function PreviousChats({ isDarkMode }) {
 
   useEffect(() => {
     const fetchChats = async () => {
-      const userId = localStorage.getItem("userId");
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/chats`, {
-          params: { user_id: userId },
-        });
-        setChats(response.data);
-      } catch (error) {
-        console.error("Error fetching chats:", error);
-      }
+        const userId = localStorage.getItem("userId");
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/chats`, {
+                params: { user_id: userId },
+            });
+
+            console.log("Fetched chats from API:", response.data); // Debugging log
+
+            const chatsWithFavourites = response.data.map((chat) => ({
+                ...chat,
+                isFavourited: chat.isFavourited !== undefined ? chat.isFavourited : false,
+            }));
+
+            console.log("Processed chats with favourites:", chatsWithFavourites); // Debugging log
+
+            setChats(chatsWithFavourites);
+        } catch (error) {
+            console.error("Error fetching chats:", error);
+        }
     };
 
     fetchChats();
-  }, []);
+}, []);
+
 
   const handleChatClick = (chatId) => {
     navigate(`/chat/${chatId}`);
@@ -46,7 +57,7 @@ function PreviousChats({ isDarkMode }) {
       });
       setChats((prevChats) =>
         prevChats.map((chat) =>
-          chat._id === chatId ? { ...chat, favourited: !isFavourited } : chat
+          chat._id === chatId ? { ...chat, isFavourited: !isFavourited } : chat
         )
       );
     } catch (error) {
@@ -66,8 +77,8 @@ function PreviousChats({ isDarkMode }) {
                 <p className="chat-summary">{chat.summary || "No summary available."}</p>
               </div>
               <div className="chat-actions">
-                <button className="favourite-button" onClick={() => handleToggleFavourite(chat._id, chat.favourited)}>
-                  {chat.favourited ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                <button className="favourite-button" onClick={() => handleToggleFavourite(chat._id, chat.isFavourited)}>
+                  {chat.isFavourited ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
                 </button>
                 <button className="delete-button" onClick={() => handleDeleteChat(chat._id)}>
                   Delete

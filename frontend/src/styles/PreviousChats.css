@@ -128,3 +128,11 @@ body {
 .delete-button:hover {
   background-color: #b71c1c;
 }
+
+.chat-actions {
+  display: flex; /* Makes buttons appear in a row */
+  gap: 10px; /* Adds spacing between buttons */
+  justify-content: flex-end; /* Aligns buttons to the right */
+  align-items: center; /* Centers buttons vertically */
+  margin-top: 10px; /* Adjusts spacing */
+}

@@ -32,6 +32,7 @@ function Navbar({ setChatId, setMessages }) {
             <Link to="/favourites">Favourites</Link>
             <Link to="/calendar">Calendar</Link>
             <Link to="/previous-chats">Previous Chats</Link>
+            <Link to="/professional-help">Professional Help</Link>
         </nav>
     );
 }

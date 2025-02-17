@@ -144,6 +144,8 @@ def get_chats():
                 "_id": str(chat["_id"]),
                 "chat_name": chat.get("chat_name", "Untitled"),
                 "summary": chat.get("summary", ""),
+                "isFavourited": chat.get("isFavourited", False) 
+
             }
             for chat in chats
         ]
@@ -371,6 +373,33 @@ def update_user():
         return jsonify({"message": "Profile updated successfully"}), 200
     except Exception as e:
         print(f"Error in /api/user/update: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/user/delete', methods=['DELETE'])
+def delete_user():
+    """Delete a user account and all associated data."""
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Ensure user exists before deletion
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Delete all chats associated with this user
+        chats_collection.delete_many({"user_id": user_id})
+
+        # Delete user from database
+        users_collection.delete_one({"_id": ObjectId(user_id)})
+
+        return jsonify({"message": "Account and associated data deleted successfully"}), 200
+
+    except Exception as e:
+        print(f"Error in /api/user/delete: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 

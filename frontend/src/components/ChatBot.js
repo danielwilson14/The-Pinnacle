@@ -1,7 +1,16 @@
-import React from 'react';
-import "../styles/ChatBot.css"; // 🔹 Import the new ChatBot.css
+import React, { useState } from 'react';
+import { FaHeart, FaRegHeart } from "react-icons/fa"; 
+import "../styles/ChatBot.css"; 
 
-function ChatBot({ messages, message, setMessage, sendMessage }) {
+function ChatBot({ messages, isFavourited, toggleFavourite }) {
+    const [message, setMessage] = useState("");
+
+    const sendMessage = () => {
+        if (!message.trim()) return;
+        console.log("Sending message:", message);
+        setMessage(""); 
+    };
+
     return (
         <div className="chat-bot-container">
             {/* Chat Display */}
@@ -18,7 +27,6 @@ function ChatBot({ messages, message, setMessage, sendMessage }) {
                 ))}
             </div>
 
-            {/* Input Area */}
             <div className="input-container">
                 <input
                     value={message}
@@ -27,6 +35,9 @@ function ChatBot({ messages, message, setMessage, sendMessage }) {
                     placeholder="Type your message"
                     className="chat-input"
                 />
+                <button className="favourite-button" onClick={toggleFavourite}>
+                    {isFavourited ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                </button>
                 <button onClick={sendMessage} className="send-button">Send</button>
             </div>
         </div>
