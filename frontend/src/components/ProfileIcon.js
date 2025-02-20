@@ -93,9 +93,26 @@ const ProfileIcon = () => {
     }
   }, [isDarkMode]);
 
-  const handleChangePassword = () => {
-    alert("Redirect to change password page/modal.");
+  const handleChangePassword = async () => {
+    const oldPassword = prompt("Enter your old password:");
+    if (!oldPassword) return;
+  
+    const newPassword = prompt("Enter your new password:");
+    if (!newPassword) return;
+  
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/user/change-password`, {
+        user_id: userId,
+        old_password: oldPassword,
+        new_password: newPassword,
+      });
+  
+      alert(response.data.message);
+    } catch (error) {
+      alert(error.response?.data?.error || "Failed to change password.");
+    }
   };
+  
 
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(

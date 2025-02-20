@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 import datetime
 import bcrypt
 import jwt
+import re
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
 
 # Load environment variables
@@ -49,6 +50,19 @@ def call_openai(messages):
         print(f"Error in OpenAI API call: {e}")
         return f"Error: {str(e)}"
 
+def is_strong_password(password):
+    """Check password strength: Minimum 8 chars, uppercase, lowercase, number, special character."""
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"\d", password):
+        return False
+    if not re.search(r"\W", password):  # Non-alphanumeric
+        return False
+    return True
 
 
 
@@ -240,6 +254,9 @@ def register():
 
         if not email or not password:
             return jsonify({"error": "Email and password are required"}), 400
+
+        if not is_strong_password(password):
+            return jsonify({"error": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."}), 400
 
         # Check if user already exists
         if users_collection.find_one({"email": email}):
@@ -448,6 +465,45 @@ def get_favourites():
     except Exception as e:
         print(f"Error in /api/favourites: {e}")
         return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/user/change-password', methods=['POST'])
+def change_password():
+    """Allow users to change their password."""
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+        old_password = data.get("old_password")
+        new_password = data.get("new_password")
+
+        if not user_id or not old_password or not new_password:
+            return jsonify({"error": "All fields are required"}), 400
+
+        # Fetch user from DB
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Check if old password is correct
+        if not bcrypt.checkpw(old_password.encode('utf-8'), user["password"]):
+            return jsonify({"error": "Incorrect old password"}), 401
+
+        # Check if new password is strong
+        if not is_strong_password(new_password):
+            return jsonify({"error": "Password must be at least 8 characters with uppercase, lowercase, number, and special character."}), 400
+
+        # Hash and update new password
+        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+        users_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"password": hashed_password}}
+        )
+
+        return jsonify({"message": "Password changed successfully"}), 200
+
+    except Exception as e:
+        print(f"Error in /api/user/change-password: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
