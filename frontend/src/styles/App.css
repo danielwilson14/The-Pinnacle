@@ -1,13 +1,13 @@
 .App {
   text-align: center;
-  background-color: #f4f4f4; /* Light mode default */
+  background-color: #F4F7FA; /* Light mode Background Base */
   color: black;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark Mode */
+/* Dark Mode Styling */
 .dark-mode .App {
-  background-color: #121212 !important;
+  background-color: #1F6F78 !important; /* Dark mode uses Primary Teal */
   color: white !important;
 }
 
@@ -25,21 +25,21 @@
 }
 
 .dark-mode .App-header {
-  background-color: #1e1e1e;
+  background-color: #1E1E1E;
 }
 
 /* Navbar should also respect dark mode */
 .navbar {
-  background-color: #ddd;
+  background-color: #D1D9E0;
   padding: 10px;
   transition: background-color 0.3s ease;
 }
 
 .dark-mode .navbar {
-  background-color: #222;
+  background-color: #2C3E50;
 }
 
-/* Profile Icon container */
+/* Profile Icon */
 .profile-icon-container {
   position: fixed;
   top: 20px;
@@ -57,27 +57,26 @@
   background-color: rgba(50, 50, 50, 0.8);
 }
 
-/* Fix links */
+/* Links Styling */
 .App-link {
-  color: #61dafb;
+  color: #3A8BBB;
 }
 
 .dark-mode .App-link {
-  color: #4fa3d1;
+  color: #3178A0;
 }
 
-/* Fix for content spacing */
+/* Content Layout */
 .content-container {
   display: flex;
   width: 100%;
 }
 
 .content {
-  flex-grow: 1; /* Takes up remaining space */
+  flex-grow: 1;
   min-width: 0;
   padding: 20px;
 }
-
 
 /* Loading animation */
 @keyframes App-logo-spin {

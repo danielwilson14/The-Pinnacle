@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css"; // Import the new CSS file
+import { FiLogOut, FiMessageCircle, FiHeart, FiCalendar, FiClock, FiHelpCircle } from "react-icons/fi";
+import "../styles/Navbar.css";
 
 function Navbar({ setChatId, setMessages }) {
     const location = useLocation();
@@ -27,12 +28,24 @@ function Navbar({ setChatId, setMessages }) {
 
     return (
         <nav className="navbar">
-            <button onClick={handleLogout}>Logout</button>
-            <button onClick={handleNewChat}>New Chat</button>
-            <Link to="/favourites">Favourites</Link>
-            <Link to="/calendar">Calendar</Link>
-            <Link to="/previous-chats">Previous Chats</Link>
-            <Link to="/professional-help">Professional Help</Link>
+            <Link to="/" onClick={handleLogout} className="nav-item">
+                <FiLogOut className="nav-icon" /> Logout
+            </Link>
+            <Link to="/chat" onClick={handleNewChat} className="nav-item">
+                <FiMessageCircle className="nav-icon" /> New Chat
+            </Link>
+            <Link to="/favourites" className="nav-item">
+                <FiHeart className="nav-icon" /> Favourites
+            </Link>
+            <Link to="/calendar" className="nav-item">
+                <FiCalendar className="nav-icon" /> Calendar
+            </Link>
+            <Link to="/previous-chats" className="nav-item">
+                <FiClock className="nav-icon" /> Previous Chats
+            </Link>
+            <Link to="/professional-help" className="nav-item">
+                <FiHelpCircle className="nav-icon" /> Professional Help
+            </Link>
         </nav>
     );
 }

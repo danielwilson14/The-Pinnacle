@@ -1,0 +1,199 @@
+/* =============================
+   ✅ General Chat Page Styling
+   ============================= */
+   body, html {
+    background: linear-gradient(135deg, #EAF2F8, #D6EAF8); /* 🔥 Light mode gradient */
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode body, .dark-mode html {
+    background-color: #1F6F78;
+}
+
+/* =============================
+   ✅ Chat Page Container
+   ============================= */
+.chat-page-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #E3F2FD, #D4E6F1); /* 🔥 Soft gradient */
+    overflow: hidden;
+}
+
+.dark-mode .chat-page-container {
+    
+    background: linear-gradient(135deg, #1F6F78, #144D54) !important;
+    
+}
+/* =============================
+   ✅ Chat Container (Main UI)
+   ============================= */
+   .chat-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 🔥 Fixes spacing */
+    align-items: center;
+    background: #FFFFFF;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 70%;
+    margin: auto;
+    padding: 20px;
+    height: calc(100vh - 80px);
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .chat-container {
+    background-color: #3A8BBB;
+    color: white;
+}
+
+/* =============================
+   ✅ Messages Display Styling
+   ============================= */
+.messages-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+    border-radius: 8px;
+    background: #F8FAFC;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.dark-mode .messages-container {
+    background-color: #3A8BBB;
+}
+
+/* =============================
+   ✅ Message Bubbles
+   ============================= */
+.message-bubble {
+    max-width: 70%;
+    padding: 14px;
+    border-radius: 16px;
+    font-size: 16px;
+    line-height: 1.4;
+    opacity: 0;
+    animation: fadeIn 0.3s ease-in-out forwards;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-bubble.user {
+    background: linear-gradient(135deg, #A1E3CB, #D8F3DC);
+    align-self: flex-end;
+    color: black;
+    border-bottom-right-radius: 5px;
+}
+
+.dark-mode .message-bubble.user {
+    background: linear-gradient(135deg, #4a7c59, #5c8d5c) !important;
+    color: #fff !important;
+}
+
+.message-bubble.bot {
+    background: linear-gradient(135deg, #E3EAF3, #D6E9F8);
+    align-self: flex-start;
+    color: black;
+    border-bottom-left-radius: 5px;
+}
+
+.dark-mode .message-bubble.bot {
+    background: linear-gradient(135deg, #1f3b4d, #2c3e50) !important;
+    color: #fff !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================
+   ✅ Input Box Styling
+   ============================= */
+.input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: #FFFFFF;
+    border-radius: 50px;
+    border-top: 1px solid #D1D9E0;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .input-container {
+    background-color: #1F6F78;
+    border-top: 1px solid #3178A0;
+}
+
+/* ✅ Adjust Chat Input */
+.chat-input {
+    flex-grow: 1;
+    padding: 12px;
+    border-radius: 50px;
+    border: 1px solid #D1D9E0;
+    background-color: white;
+    font-size: 16px;
+    outline: none;
+    padding-left: 15px;
+    width: 100%;
+}
+
+.chat-input:focus {
+    border: 2px solid #3A8BBB;
+    box-shadow: 0 0 8px rgba(58, 139, 187, 0.4);
+}
+
+.dark-mode .chat-input {
+    background-color: #3178A0;
+    border: 1px solid #A7D8E8;
+    color: white;
+}
+
+/* =============================
+   ✅ Buttons (Send & Favourite)
+   ============================= */
+.favourite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.favourite-button:hover {
+    transform: scale(1.2);
+}
+
+.send-button {
+    padding: 10px 15px;
+    background: linear-gradient(135deg, #45A049, #4CAF50);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.send-button:hover {
+    background: linear-gradient(135deg, #388E3C, #45A049);
+}

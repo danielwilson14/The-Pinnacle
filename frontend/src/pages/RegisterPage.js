@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../styles/RegisterPage.css';  // Import CSS file
 
 function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -10,7 +11,6 @@ function RegisterPage() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    // 🔒 Password Strength Checker
     const checkPasswordStrength = (password) => {
         let strength = 0;
         if (password.length >= 8) strength += 1;
@@ -54,102 +54,31 @@ function RegisterPage() {
     };
 
     return (
-        <div style={styles.pageContainer}>
-            <div style={styles.formContainer}>
-                <h2 style={styles.title}>Register</h2>
+        <div className="page-container">
+            <div className="form-container">
+                <h2 className="title">Register</h2>
                 <form onSubmit={handleRegister}>
-                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required style={styles.input} />
-                    <input type="password" placeholder="Password" value={password} onChange={handlePasswordChange} required style={styles.input} />
-                    <span style={{ color: passwordStrength === "Weak" ? "red" : passwordStrength === "Medium" ? "orange" : "green", fontWeight: "bold" }}>
+                    <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="input" />
+                    <input type="password" placeholder="Password" value={password} onChange={handlePasswordChange} required className="input" />
+                    <span className={`password-strength ${passwordStrength.toLowerCase()}`}>
                         {passwordStrength}
                     </span>
-                    <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required style={styles.input} />
+                    <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="input" />
                     {error && (
-                        <div style={styles.errorBox}>
+                        <div className="error-box">
                             <p>{error}</p>
                         </div>
                     )}
-                    <button type="submit" style={styles.button}>
-                        <img src="/Arrow.png" alt="Arrow" style={styles.arrowIcon} />
+                    <button type="submit" className="button">
+                        Register
                     </button>
                 </form>
-                <p style={styles.loginText}>
-                    Already have an account? <a href="/" style={styles.link}>Login</a>
+                <p className="login-text">
+                    Already have an account? <a href="/" className="link">Login</a>
                 </p>
             </div>
         </div>
     );
 }
-
-const styles = {
-    pageContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        width: '100vw',
-        backgroundColor: '#f4f4f4',
-        margin: 0,
-        padding: 0,
-        position: 'relative',
-    },
-    formContainer: {
-        backgroundColor: '#d7ede2',
-        padding: '40px',
-        borderRadius: '12px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        width: '300px',
-        textAlign: 'center',
-    },
-    title: {
-        fontSize: '24px',
-        marginBottom: '20px',
-    },
-    input: {
-        width: '100%',
-        padding: '10px',
-        margin: '10px 0',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-    },
-    button: {
-        width: '100%',
-        padding: '10px',
-        backgroundColor: '#6abf69',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontWeight: 'bold',
-    },
-    arrowIcon: {
-        width: '60px',
-        height: '60px',
-    },
-    loginText: {
-        marginTop: '15px',
-    },
-    link: {
-        color: '#6abf69',
-        textDecoration: 'none',
-        fontWeight: 'bold',
-    },
-    errorBox: {
-        backgroundColor: "#ffe5e5",  
-        color: "#d32f2f",  
-        border: "1px solid #d32f2f",  
-        borderRadius: "8px",
-        padding: "10px",
-        fontSize: "14px",
-        fontWeight: "bold",
-        textAlign: "center",
-        lineHeight: "1.4",  
-        marginTop: "10px",  
-        maxWidth: "270px",  
-        display: "block",  
-    }
-    
-    
-};
 
 export default RegisterPage;

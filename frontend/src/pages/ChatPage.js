@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import ChatBot from "../components/ChatBot";
 import Navbar from "../components/Navbar";
 import { FaHeart, FaRegHeart } from "react-icons/fa"; 
-import "../styles/ChatPage.css";
+import "../styles/Chat.css";
 
 function ChatPage() {
     const { chatId: routeChatId } = useParams();
@@ -15,6 +14,7 @@ function ChatPage() {
     const navigate = useNavigate();
     const isDarkMode = localStorage.getItem("darkMode") === "true";
 
+    // 🚀 Fetch chat messages if chatId exists
     useEffect(() => {
         const fetchChat = async () => {
             if (chatId) {
@@ -33,6 +33,7 @@ function ChatPage() {
         fetchChat();
     }, [chatId]);
 
+    // 🚀 Send message
     const sendMessage = async () => {
         if (!message.trim()) return;
         
@@ -56,21 +57,22 @@ function ChatPage() {
 
             setMessage("");
 
-            // 🚨 If message is serious, suggest help page
-        const seriousKeywords = ["suicide", "depressed", "self-harm", "hopeless"];
-        if (seriousKeywords.some(word => message.toLowerCase().includes(word))) {
-            const confirmRedirect = window.confirm(
-                "It sounds like you're going through something serious. Would you like to see professional help options?"
-            );
-            if (confirmRedirect) {
-                navigate("/professional-help");
+            // 🚨 Serious message detection
+            const seriousKeywords = ["suicide", "depressed", "self-harm", "hopeless"];
+            if (seriousKeywords.some(word => message.toLowerCase().includes(word))) {
+                const confirmRedirect = window.confirm(
+                    "It sounds like you're going through something serious. Would you like to see professional help options?"
+                );
+                if (confirmRedirect) {
+                    navigate("/professional-help");
+                }
             }
-        }
         } catch (error) {
             console.error("Error sending message:", error);
         }
     };
 
+    // ⭐ Toggle chat favourite
     const toggleFavourite = async () => {
         try {
             await axios.post(`${process.env.REACT_APP_API_URL}/api/favourites/toggle`, { chat_id: chatId });
@@ -84,14 +86,39 @@ function ChatPage() {
         <div className={`chat-page-container ${isDarkMode ? "dark-mode" : ""}`}>
             <Navbar />
             <div className="chat-container">
-                <ChatBot 
-                    messages={messages} 
-                    isFavourited={isFavourited} 
-                    toggleFavourite={toggleFavourite}
-                />
+                {/* Chat Messages */}
+                <div className="messages-container">
+                    {messages.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`message-bubble ${msg.sender === 'user' ? 'user' : 'bot'}`}
+                        >
+                            <p className="message-text">
+                                <strong>{msg.sender === 'user' ? 'You' : 'Bot'}:</strong> {String(msg.text)}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+    
+                {/* Message Input */}
+                <div className="input-container">
+                    <input
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                        placeholder="Type your message"
+                        className="chat-input"
+                    />
+                    <button className="favourite-button" onClick={toggleFavourite}>
+                        {isFavourited ? <FaHeart color="red" /> : <FaRegHeart color="gray" />}
+                    </button>
+                    <button onClick={sendMessage} className="send-button">Send</button>
+                </div>
             </div>
         </div>
     );
+    
+    
 }
 
 export default ChatPage;
