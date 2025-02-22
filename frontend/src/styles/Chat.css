@@ -94,9 +94,10 @@
 }
 
 .dark-mode .message-bubble.user {
-    background: linear-gradient(135deg, #4a7c59, #5c8d5c) !important;
+    background: linear-gradient(135deg, #5B9A68, #6FBF73) !important; 
     color: #fff !important;
 }
+
 
 .message-bubble.bot {
     background: linear-gradient(135deg, #E3EAF3, #D6E9F8);
@@ -196,4 +197,48 @@
 
 .send-button:hover {
     background: linear-gradient(135deg, #388E3C, #45A049);
+}
+
+/* Scrollbar Styling for Dark Mode */
+.dark-mode .messages-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dark-mode .messages-container::-webkit-scrollbar-track {
+    background: #1b3b47; /* Dark blueish background */
+    border-radius: 10px;
+}
+
+.dark-mode .messages-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #206b88, #1f6f78); /* Blends well with dark mode */
+    border-radius: 10px;
+}
+
+.dark-mode .messages-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1b5e77, #145666); /* Darker on hover */
+}
+
+
+/* Scrollbar Styling for Light Mode */
+.messages-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: #d3dae3; /* A soft, medium-light gray */
+    border-radius: 10px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #8a9aa9, #6c7a89); /* Subtle contrast */
+    border-radius: 10px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #7a8999, #55626f); /* Darker on hover */
+}
+
+/* Dark Mode Placeholder Fix */
+.dark-mode .chat-input::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important; /* Softer white for readability */
 }
