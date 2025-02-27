@@ -1,127 +1,203 @@
-/* General Wrapper */
-.favourites-chats-wrapper {
+/* =============================
+   ✅ General Wrapper Styling
+   ============================= */
+   .favourites-chats-wrapper {
     display: flex;
-    height: 100vh;
-    background-color: #f4f4f4;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background: url("../assets/Light Background.png") no-repeat center center;
+    background-size: cover;
+    overflow-y: auto;
+    overflow-x: hidden; 
+
 }
 
-/* Dark Mode */
 .dark-mode .favourites-chats-wrapper {
-    background-color: #121212;
-    color: white;
+    background: url("../assets/Dark Background.png") no-repeat center center;
+    background-size: cover;
 }
 
-/* Container for Favourite Chats */
+/* =============================
+   ✅ Chat Container
+   ============================= */
 .chats-container {
     width: 100%;
+    max-width: 1300px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
+    overflow-x: hidden;
+    gap: 25px; /* Increased gap for breathing space */
+    max-height: calc(100vh - 80px);
 }
 
-/* Page Heading */
+/* =============================
+   ✅ Page Heading
+   ============================= */
 .heading {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-/* Chat List */
+/* =============================
+   ✅ Chat List & Cards
+   ============================= */
 .chat-list {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(300px, 1fr)); /* ✅ Ensure 3 Columns */
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* ✅ Chat Cards */
+.chat-card {
+    background: linear-gradient(135deg, #FFFFFF, #F8FAFC);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 800px;
-    gap: 15px;
-}
-
-/* Individual Chat Card */
-.chat-card {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
+    position: relative;
 }
 
-.chat-card:hover {
-    transform: scale(1.02);
-}
-
-/* Dark Mode: Chat Cards */
+/* ✅ Dark Mode Chat Cards */
 .dark-mode .chat-card {
-    background-color: #2a2a2a;
+    background: linear-gradient(135deg, #2C3E50, #1F3B4D);
     color: white;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
 }
 
-/* Chat Info (Click to Open Chat) */
+/* ✅ Hover Effects */
+.chat-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .chat-card:hover {
+    box-shadow: 0 6px 12px rgba(255, 255, 255, 0.15);
+}
+
+/* ✅ Chat Info */
 .chat-info {
     flex-grow: 1;
+    padding-bottom: 15px;
 }
 
 .chat-title {
     font-size: 18px;
     font-weight: bold;
-    margin: 0;
+    margin: 0 0 5px 0;
 }
 
 .chat-summary {
     font-size: 14px;
     color: #666;
-    margin: 5px 0 0;
+    line-height: 1.6;
+    margin: 0;
 }
 
-/* Dark Mode: Chat Summary */
+/* ✅ Dark Mode Chat Summary */
 .dark-mode .chat-summary {
     color: #bbb;
 }
 
-/* Delete & Favourite Buttons */
-.delete-button,
-.favourite-button {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+/* =============================
+   ✅ Chat Actions (Button Container)
+   ============================= */
+.chat-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
 }
 
-.delete-button:hover,
-.favourite-button:hover {
-    transform: scale(1.2);
-}
-
-/* Delete Button */
+/* =============================
+   ✅ Delete Button
+   ============================= */
 .delete-button {
-    color: red;
+    position: absolute;  /* 🔥 Ensures it stays inside the card */
+    bottom: 10px; /* 🔥 Positions at the bottom */
+    right: 10px; /* 🔥 Positions at the right */
+    padding: 8px;
+    background: linear-gradient(135deg, #d32f2f, #f44336);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: white;
+    transition: transform 0.2s ease-in-out, background 0.3s ease-in-out;
 }
 
-/* Favourite Button */
-.favourite-button {
-    color: gray;
+.delete-button:hover {
+    background: linear-gradient(135deg, #b71c1c, #d32f2f);
+    transform: scale(1.1);
 }
 
-/* Favourite Button (Active State) */
-.favourite-button.favourited {
-    color: gold;
+/* Scrollbar Styling for Dark Mode */
+.dark-mode .chat-list::-webkit-scrollbar {
+    width: 8px;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .chat-card {
-        flex-direction: column;
-        align-items: flex-start;
+.dark-mode .chat-list::-webkit-scrollbar-track {
+    background: #1b3b47; /* Dark blueish background */
+    border-radius: 10px;
+}
+
+.dark-mode .chat-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #206b88, #1f6f78); /* Blends well with dark mode */
+    border-radius: 10px;
+}
+
+.dark-mode .chat-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1b5e77, #145666); /* Darker on hover */
+}
+
+/* Scrollbar Styling for Light Mode */
+.chat-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-list::-webkit-scrollbar-track {
+    background: #d3dae3; /* A soft, medium-light gray */
+    border-radius: 10px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #8a9aa9, #6c7a89); /* Subtle contrast */
+    border-radius: 10px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #7a8999, #55626f); /* Darker on hover */
+}
+
+
+/* =============================
+   ✅ Responsive Design
+   ============================= */
+@media (max-width: 1024px) {
+    .chat-list {
+        grid-template-columns: repeat(2, minmax(300px, 1fr)); /* 2 Columns on Medium Screens */
     }
+}
 
-    .delete-button, .favourite-button {
-        align-self: flex-end;
+@media (max-width: 768px) {
+    .chat-list {
+        grid-template-columns: repeat(1, minmax(100%, 1fr)); /* 1 Column on Mobile */
+    }
+    .delete-button {
+        padding: 4px;
     }
 }

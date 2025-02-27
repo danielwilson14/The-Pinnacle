@@ -97,18 +97,20 @@ const CalendarPage = () => {
 
   return (
     <div className="calendar-wrapper">
-      {[...Array(12)].map((_, index) => {
-        const month = index + 1;
-        const year = new Date().getFullYear();
-        return (
-          <div key={month} className="month">
-            <h3>{new Date(year, month - 1).toLocaleString("default", { month: "long" })}</h3>
-            <div className="calendar-grid">{renderCalendar(month, year)}</div>
-          </div>
-        );
-      })}
-
-      {/* Move popup to the very end to avoid nesting issues */}
+      <div className="calendar-content">
+        {[...Array(12)].map((_, index) => {
+          const month = index + 1;
+          const year = new Date().getFullYear();
+          return (
+            <div key={month} className="month">
+              <h3>{new Date(year, month - 1).toLocaleString("default", { month: "long" })}</h3>
+              <div className="calendar-grid">{renderCalendar(month, year)}</div>
+            </div>
+          );
+        })}
+      </div>
+  
+      {/* Popup should stay outside the scrollable area */}
       {showPopup && (
         <div className="calendar-popup-overlay active" onClick={closePopup}>
           <div className="calendar-popup" onClick={(e) => e.stopPropagation()}>
