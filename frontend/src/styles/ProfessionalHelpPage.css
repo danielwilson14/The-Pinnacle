@@ -1,97 +1,159 @@
+.professional-help-page {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: hidden;
+  height: 100vh;
+  background: url("../assets/Light Background.png") no-repeat center center;
+  background-size: cover;
+
+}
+
+/* Dark Mode Background Override */
+.dark-mode .professional-help-page {
+  background: url("../assets/Dark Background.png") no-repeat center center;
+  background-size: cover;
+
+}
+
 /* 🌟 General Page Styling */
 .help-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .dark-mode .help-container {
-    background: #222;
-    color: white;
-  }
-  
-  /* 🏷️ Headings */
-  .help-container h1 {
-    font-size: 28px;
-    color: #333;
-  }
-  
-  .dark-mode .help-container h1 {
-    color: white;
-  }
-  
-  .help-container h2 {
-    font-size: 22px;
-    color: #444;
-  }
-  
-  .dark-mode .help-container h2 {
-    color: #ddd;
-  }
-  
-  /* 📜 Text */
-  .help-container p {
-    font-size: 16px;
-    color: #555;
-  }
-  
-  .dark-mode .help-container p {
-    color: #ccc;
-  }
-  
-  /* 📌 Sections */
-  .help-section {
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    text-align: left;
-  }
-  
-  .dark-mode .help-section {
-    background-color: #333;
-  }
-  
-  .emergency {
-    background-color: #ffe5e5;
-    border-left: 5px solid #d32f2f;
-  }
-  
-  .dark-mode .emergency {
-    background-color: #550000;
-    color: white;
-  }
-  
-  /* 📞 Contact Information */
-  .help-container ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .help-container li {
-    font-size: 16px;
-    margin: 8px 0;
-  }
-  
-  /* 🔗 Links */
-  .help-container a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  .help-container a:hover {
-    text-decoration: underline;
-  }
-  
-  /* 💙 Footer Message */
-  .help-footer {
-    font-size: 14px;
-    font-weight: bold;
-    color: #007bff;
-    margin-top: 20px;
-  }
-  
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #EAF2F8, #D4E6F1);
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  overflow-y: auto;
+  max-height: calc(100vh - 80px);
+}
+
+.dark-mode .help-container {
+  background: linear-gradient(135deg, #1F6F78, #144D54);
+  color: white;
+}
+
+/* 🏷️ Headings */
+.help-container h1 {
+  font-size: 28px;
+  color: #144D54;
+}
+
+.dark-mode .help-container h1 {
+  color: #EAF2F8;
+}
+
+.help-container h2 {
+  font-size: 22px;
+  color: #1F6F78;
+}
+
+.dark-mode .help-container h2 {
+  color: #D6EAF8;
+}
+
+/* 📜 Text */
+.help-container p {
+  font-size: 16px;
+  color: #2A2A2A;
+}
+
+.dark-mode .help-container p {
+  color: #EAF2F8;
+}
+
+/* 📌 Sections */
+.help-section {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #E3F2FD, #D4E6F1);
+  text-align: left;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.dark-mode .help-section {
+  background: linear-gradient(135deg, #1F3B4D, #2C3E50);
+}
+
+.emergency {
+  background: linear-gradient(135deg, #FFC1C1, #FF7575);
+  border-left: 5px solid #B71C1C;
+  color: #8B0000;
+}
+
+.dark-mode .emergency {
+  background: linear-gradient(135deg, #8B0000, #FF5757);
+  color: white;
+}
+
+/* 📞 Contact Information */
+.help-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.help-container li {
+  font-size: 16px;
+  margin: 8px 0;
+  color: #1F6F78;
+}
+
+.dark-mode .help-container li {
+  color: #D6EAF8;
+}
+
+/* 🔗 Links */
+.help-container a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.help-container a:hover {
+  text-decoration: underline;
+}
+
+/* 💙 Footer Message */
+.help-footer {
+  font-size: 14px;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: 20px;
+}
+
+/* =============================
+   ✅ Custom Scrollbar Styling
+   ============================= */
+   .help-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.help-container::-webkit-scrollbar-track {
+    background: #d3dae3;
+    border-radius: 10px;
+}
+
+.help-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #8a9aa9, #6c7a89);
+    border-radius: 10px;
+}
+
+.help-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #7a8999, #55626F);
+}
+
+/* ✅ Dark Mode Scrollbar */
+.dark-mode .help-container::-webkit-scrollbar-track {
+    background: #1b3b47;
+}
+
+.dark-mode .help-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #206b88, #1f6f78);
+}
+
+.dark-mode .help-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #1b5e77, #145666);
+}
