@@ -19,7 +19,9 @@ function LoginPage() {
             // Store JWT Token & User ID
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("userId", response.data.user_id);
+            localStorage.setItem("verified", response.data.verified); // ✅ Store verified status
 
+ 
             // Navigate to chat
             navigate("/chat");
         } catch (err) {

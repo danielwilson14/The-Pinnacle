@@ -10,6 +10,10 @@ import bcrypt
 import jwt
 import re
 from flask_jwt_extended import create_access_token, jwt_required, JWTManager
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 # Load environment variables
 load_dotenv()
@@ -18,7 +22,8 @@ OPENAI_KEY = os.getenv("OPENAI_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")  # Default model
 MONGO_URI = os.getenv("MONGO_URI")
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")  # JWT Secret Key
-
+EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")  # Your email
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # App password or email password
 # Configure OpenAI
 openai.api_key = OPENAI_KEY
 
@@ -64,7 +69,36 @@ def is_strong_password(password):
         return False
     return True
 
+def send_verification_email(user_email, token):
+    """Send a verification email with a unique token."""
+    try:
+        verification_link = f"{os.getenv('FRONTEND_URL')}/verify/{token}"
+        print(f"Sending verification email to: {user_email}")
+        print(f"Verification link: {verification_link}")
 
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_ADDRESS
+        msg["To"] = user_email
+        msg["Subject"] = "Verify your email"
+
+        body = f"""
+        <h3>Verify your email</h3>
+        <p>Click the link below to verify your email and access all features:</p>
+        <a href="{verification_link}">{verification_link}</a>
+        <p>If you did not request this, you can safely ignore it.</p>
+        """
+        msg.attach(MIMEText(body, "html"))
+
+        # Send email
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_ADDRESS, user_email, msg.as_string())
+
+        print(f"Verification email sent successfully!")
+
+    except Exception as e:
+        print(f"Error sending verification email: {e}")
 
 
 @app.route('/api/chat', methods=['POST'])
@@ -264,19 +298,42 @@ def register():
 
         # Hash the password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        verification_token = str(ObjectId())
 
         # Insert user into database
         user = {
             "email": email,
             "password": hashed_password,
+            "verified": False,  # New users are unverified
+            "verification_token": verification_token,
             "created_at": datetime.datetime.utcnow()
         }
         user_id = users_collection.insert_one(user).inserted_id
 
-        return jsonify({"message": "User registered", "user_id": str(user_id)}), 201
+         # **Debugging Prints**
+        print(f"✅ User registered: {email}")
+        print(f"✅ Calling send_verification_email with token: {verification_token}")
+
+        # Call the function
+        send_verification_email(email, verification_token)
+
+        return jsonify({"message": "Registration successful! Please verify your email."}), 201
     except Exception as e:
-        print(f"Error in /api/register: {str(e)}")
-        return jsonify({"error": "Internal server error", "details": str(e)}), 500
+        print(f"❌ Error in /api/register: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/verify-email/<token>', methods=['GET'])
+def verify_email(token):
+    try:
+        user = users_collection.find_one({"verification_token": token})
+        if not user:
+            return jsonify({"error": "Invalid or expired token"}), 400
+
+        users_collection.update_one({"_id": user["_id"]}, {"$set": {"verified": True}, "$unset": {"verification_token": ""}})
+        return jsonify({"message": "Email verified successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -301,7 +358,9 @@ def login():
         return jsonify({
             "message": "Login successful",
             "token": access_token,
-            "user_id": str(user["_id"])
+            "user_id": str(user["_id"]),
+            "verified": user.get("verified", False)
+            
         }), 200
     except Exception as e:
         print(f"Error in /api/login: {str(e)}")

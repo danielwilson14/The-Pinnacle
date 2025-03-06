@@ -1,0 +1,13 @@
+.verification-banner {
+    background-color: #ffcc00; /* Yellow warning */
+    color: #333;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px; /* ✅ Slightly smaller text */
+    
+    position: absolute; /* ✅ Keeps it inside the content area */
+    top: 0;
+    width: 100%; /* ✅ Ensures it fits inside the main content */
+    z-index: 10;
+    border-bottom: 2px solid #e6b800; /* ✅ Optional separator */
+}

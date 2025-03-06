@@ -7,9 +7,14 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
       - OPENAI_KEY=${OPENAI_KEY}
       - OPENAI_MODEL=${OPENAI_MODEL}
       - MONGO_URI=mongodb+srv://danielwilson5525:Dissertation123@cluster1.d0wmq.mongodb.net/talktomeAI?retryWrites=true&w=majority
+      - EMAIL_ADDRESS=kiva.auth@gmail.com
+      - EMAIL_PASSWORD=qsjxglhyvgluavgb
+      - FRONTEND_URL=http://localhost:3000
+
     depends_on:
       - mongo
 

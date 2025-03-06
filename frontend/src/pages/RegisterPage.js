@@ -33,25 +33,31 @@ function RegisterPage() {
     const handleRegister = async (e) => {
         e.preventDefault();
         setError("");
-
+    
         if (password !== confirmPassword) {
             setError("Passwords do not match.");
             return;
         }
-
+    
         if (passwordStrength === "Weak") {
             setError("Your password is too weak. Please make it stronger.");
             return;
         }
-
+    
         try {
             const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/register`, { email, password });
-            alert("Registration successful! Please log in.");
+    
+            // Store JWT Token & User ID to keep user logged in after registering
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("userId", res.data.user_id);
+    
+            // Redirect to chat page
             navigate('/chat');
         } catch (err) {
             setError(err.response?.data?.error || "Registration failed.");
         }
     };
+    
 
     return (
         <div className="page-container">

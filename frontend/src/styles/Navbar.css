@@ -1,5 +1,5 @@
 .navbar {
-  width: 250px;
+  width: 280px;
   height: 100vh;
   background-color: #3A8BBB;
   background: linear-gradient(135deg, #5fa7d4, #3c8e97);
@@ -12,6 +12,7 @@
   left: 0;
   top: 0;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .dark-mode .navbar {
