@@ -242,3 +242,14 @@
 .dark-mode .chat-input::placeholder {
     color: rgba(255, 255, 255, 0.7) !important; /* Softer white for readability */
 }
+
+@keyframes dotsAnimation {
+    0% { content: "."; }
+    33% { content: ".."; }
+    66% { content: "..."; }
+    100% { content: "."; }
+}
+.thinking::after {
+    content: ".";
+    animation: dotsAnimation 1s infinite;
+}

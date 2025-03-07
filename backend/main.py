@@ -103,7 +103,7 @@ def send_verification_email(user_email, token):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    """Handle user messages and save chat to MongoDB."""
+    """Handle user messages, remember context within a session, and save chat to MongoDB."""
     try:
         data = request.json
         user_id = data.get("user_id", "anonymous")
@@ -114,11 +114,22 @@ def chat():
         if not user_message:
             return jsonify({"error": "Message is required"}), 400
 
-        # Generate OpenAI response
-        assistant_reply = call_openai([
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": user_message},
-        ])
+        conversation_history = [{"role": "system", "content": "You are a helpful assistant."}]
+
+        if not is_new_chat:
+            # Fetch existing chat messages to maintain conversation memory
+            chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
+            if chat:
+                conversation_history.extend(chat["messages"])  # Include past messages
+
+        # Add the new user message to the conversation
+        conversation_history.append({"role": "user", "content": user_message})
+
+        # Generate assistant's reply based on the full conversation
+        assistant_reply = call_openai(conversation_history)
+
+        # Add the assistant’s response to the conversation history
+        conversation_history.append({"role": "assistant", "content": assistant_reply})
 
         if is_new_chat:
             # Create a new chat document in the database
@@ -130,10 +141,7 @@ def chat():
             chat_doc = {
                 "user_id": user_id,
                 "chat_name": summary or "Untitled Chat",
-                "messages": [
-                    {"role": "user", "content": user_message},
-                    {"role": "assistant", "content": assistant_reply},
-                ],
+                "messages": conversation_history[1:],  # Exclude system prompt
                 "summary": summary,
                 "created_at": datetime.datetime.utcnow(),
             }
@@ -143,21 +151,10 @@ def chat():
                 "chat_id": str(result.inserted_id)
             }), 200
         else:
-            # Append to the existing chat document
-            chat = chats_collection.find_one({"_id": ObjectId(chat_id)})
-            if not chat:
-                return jsonify({"error": "Chat not found"}), 404
-
-            # Push the user's message
+            # Update existing chat by appending the new conversation data
             chats_collection.update_one(
                 {"_id": ObjectId(chat_id)},
-                {"$push": {"messages": {"role": "user", "content": user_message}}}
-            )
-
-            # Push the assistant's reply
-            chats_collection.update_one(
-                {"_id": ObjectId(chat_id)},
-                {"$push": {"messages": {"role": "assistant", "content": assistant_reply}}}
+                {"$set": {"messages": conversation_history[1:]}}  # Exclude system prompt
             )
 
             return jsonify({"assistant_reply": assistant_reply, "chat_id": chat_id}), 200
@@ -166,10 +163,6 @@ def chat():
         print(f"Error in /api/chat: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-
-    except Exception as e:
-        print(f"Error in /api/chat: {e}")
-        return jsonify({"error": "Internal server error"}), 500
 
 
 @app.route('/api/chats', methods=['GET'])
