@@ -9,6 +9,7 @@ import CalendarPage from "./pages/CalendarPage";
 import PreviousChats from "./pages/PreviousChats";
 import ProfessionalHelpPage from "./pages/ProfessionalHelpPage";
 import VerifyPage from "./pages/VerifyPage";
+import FAQPage from "./pages/FAQPage";
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/chat/:chatId" element={<ChatPage />} />
                     <Route path="/professional-help" element={<ProfessionalHelpPage />} />
                     <Route path="/verify/:token" element={<VerifyPage />} />
+                    <Route path="/faq" element={<FAQPage />} />
                 </Routes>
             </Layout>
         </Router>

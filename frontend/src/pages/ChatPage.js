@@ -36,10 +36,19 @@ function ChatPage() {
             if (chatId) {
                 try {
                     const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/chats/${chatId}`);
-                    setMessages(res.data.messages.map(msg => ({
+                    const chatHistory = res.data.messages.map(msg => ({
                         sender: msg.role === "user" ? "user" : "bot",
                         text: msg.content,
-                    })));
+                    }));
+                    
+                    // Check if the last message in history is from the bot
+                    if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].sender === "bot") {
+                        const lastBotMessage = chatHistory.pop(); // Remove last bot message from history
+                        setMessages(chatHistory); // Set previous messages normally
+                        typeOutMessage(lastBotMessage.text); // Ensure first bot response types out
+                    } else {
+                        setMessages(chatHistory); // Just set the messages normally if no bot response
+                    }                    
                     setIsFavourited(res.data.isFavourited || false);
                 } catch (error) {
                     console.error("Error fetching chat:", error);

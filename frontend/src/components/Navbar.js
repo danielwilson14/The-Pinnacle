@@ -46,6 +46,9 @@ function Navbar({ setChatId, setMessages }) {
             <Link to="/professional-help" className="nav-item">
                 <FiHelpCircle className="nav-icon" /> Professional Help
             </Link>
+            <Link to="/faq" className="nav-item">
+                <FiHelpCircle className="nav-icon" /> FAQ
+            </Link>
         </nav>
     );
 }
