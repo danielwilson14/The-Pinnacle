@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import { FaHeart, FaRegHeart } from "react-icons/fa"; 
 import "../styles/Chat.css";
+import ReactMarkdown from 'react-markdown';
 
 function ChatPage() {
     const { chatId: routeChatId } = useParams();
@@ -11,16 +12,16 @@ function ChatPage() {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
     const [isFavourited, setIsFavourited] = useState(false);
-    const [botThinking, setBotThinking] = useState(false); // ⏳ Track if bot is "thinking"
-    const [thinkingDots, setThinkingDots] = useState(""); // 💬 Animated dots
-    const [typingMessage, setTypingMessage] = useState(""); // 📝 Bot typing effect
+    const [botThinking, setBotThinking] = useState(false); //  Track if bot is "thinking"
+    const [thinkingDots, setThinkingDots] = useState(""); //  Animated dots
+    const [typingMessage, setTypingMessage] = useState(""); //  Bot typing effect
     const navigate = useNavigate();
     const isDarkMode = localStorage.getItem("darkMode") === "true";
     
-    // 🔽 Auto-scroll reference
+    //  Auto-scroll reference
     const messagesEndRef = useRef(null);
 
-    // ⏳ Animate "thinking" dots
+    //  Animate "thinking" dots
     useEffect(() => {
         if (botThinking) {
             const interval = setInterval(() => {
@@ -161,22 +162,24 @@ function ChatPage() {
                 {/* Chat Messages */}
                 <div className="messages-container">
                     {messages.map((msg, index) => (
-                        <div
-                            key={index}
-                            className={`message-bubble ${msg.sender === 'user' ? 'user' : 'bot'}`}
-                        >
-                            <p className="message-text">
-                                <strong>{msg.sender === 'user' ? 'You' : 'Bot'}:</strong> {String(msg.text)}
-                                {botThinking && msg.text.startsWith("Bot is thinking") && <span>{thinkingDots}</span>}
-                            </p>
+                        <div key={index} className={`message-bubble ${msg.sender === 'user' ? 'user' : 'bot'}`}>
+                            {msg.sender === "bot" && botThinking && msg.text.startsWith("Bot is thinking") ? (
+                                <p className="message-text">
+                                    <strong>Bot:</strong> Bot is thinking<span className="thinking">{thinkingDots}</span>
+                                </p>
+                            ) : (
+                                <ReactMarkdown className="message-text">
+                                    {`**${msg.sender === "user" ? "You" : "Bot"}:** ${msg.text}`}
+                                </ReactMarkdown>
+                            )}
                         </div>
                     ))}
                     {/* 🔽 Typing effect placeholder */}
                     {typingMessage && (
                         <div className="message-bubble bot">
-                            <p className="message-text">
-                                <strong>Bot:</strong> {typingMessage}
-                            </p>
+                            <ReactMarkdown className="message-text" key={typingMessage}>
+                                {`**Bot:** ${typingMessage}`}
+                            </ReactMarkdown>
                         </div>
                     )}
                     {/* 🔽 Auto-scroll target */}

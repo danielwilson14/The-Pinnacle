@@ -43,17 +43,53 @@ chats_collection = mongo.db.chats
 
 def call_openai(messages):
     try:
-        # Call OpenAI API using the updated syntax and correct method
+        system_message = {
+            "role": "system",
+            "content": (
+                "You are an empathetic and supportive AI assistant on a mental health platform, "
+                "designed to provide users with a safe space to express their thoughts and feelings. "
+                "Your primary role is to listen actively, acknowledge their emotions, and engage in "
+                "compassionate conversations.\n\n"
+                
+                "**Message Formatting Guidelines:**\n"
+                "- **Use short paragraphs** (2-3 sentences max per paragraph) for readability.\n"
+                "- **Format responses using markdown:**\n"
+                "  - Bold (`**bold**`), italics (`*italics*`), bullet points (`- `), numbered lists (`1. `).\n"
+                "- **Use line breaks (`\n`) for new paragraphs.**\n"
+                "- Avoid large, uninterrupted blocks of text.\n\n"
+
+                "**Active Listening:** Allow users to share their experiences without interruption. "
+                "Use reflective statements to show understanding, such as, 'It sounds like you're going through a challenging time.'\n\n"
+
+                "**Empathetic Engagement:** Respond with empathy and warmth. Example: 'I can understand how that situation could be very stressful.'\n\n"
+
+                "**Non-Judgmental Support:** Maintain a neutral and accepting tone, ensuring users feel safe to share openly without fear of judgment.\n\n"
+
+                "**Guided Assistance:** When appropriate, gently guide users towards available resources, "
+                "such as professional help pages, self-assessment tools, or coping strategies, without imposing solutions.\n\n"
+
+                "**User Autonomy:** Empower users by validating their feelings and encouraging them to explore their thoughts and emotions at their own pace.\n\n"
+
+                "**Remember:** Your goal is to create a comforting environment where users feel heard, understood, and supported."
+            )
+        }
+
+        # Ensure system message is always included at the start of the conversation
+        full_conversation = [system_message] + messages
+
         response = openai.chat.completions.create(
             model=OPENAI_MODEL,
-            messages=messages,
-            max_tokens=150
+            messages=full_conversation,
+            max_tokens=500,  # ⬆ Increased from 150 to 500 for longer responses
+            temperature=0.7
         )
-        # Extract and return the assistant's reply
-        return response.choices[0].message.content
+
+        return response.choices[0].message.content.strip()  # Ensure clean output
+
     except Exception as e:
         print(f"Error in OpenAI API call: {e}")
         return f"Error: {str(e)}"
+
 
 def is_strong_password(password):
     """Check password strength: Minimum 8 chars, uppercase, lowercase, number, special character."""
@@ -73,8 +109,8 @@ def send_verification_email(user_email, token):
     """Send a verification email with a unique token."""
     try:
         verification_link = f"{os.getenv('FRONTEND_URL')}/verify/{token}"
-        print(f"Sending verification email to: {user_email}")
-        print(f"Verification link: {verification_link}")
+        print(f" Attempting to send verification email to: {user_email}")
+        print(f" Verification link: {verification_link}")
 
         msg = MIMEMultipart()
         msg["From"] = EMAIL_ADDRESS
@@ -83,22 +119,26 @@ def send_verification_email(user_email, token):
 
         body = f"""
         <h3>Verify your email</h3>
-        <p>Click the link below to verify your email and access all features:</p>
+        <p>Click the link below to verify your email:</p>
         <a href="{verification_link}">{verification_link}</a>
-        <p>If you did not request this, you can safely ignore it.</p>
+        <p>If you did not request this, ignore it.</p>
         """
         msg.attach(MIMEText(body, "html"))
 
-        # Send email
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
+        # Using SMTP_SSL for more reliable connection
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             server.sendmail(EMAIL_ADDRESS, user_email, msg.as_string())
 
-        print(f"Verification email sent successfully!")
+        print(f" Email sent successfully to {user_email}")
 
-    except Exception as e:
-        print(f"Error sending verification email: {e}")
+    except smtplib.SMTPAuthenticationError:
+        print(" SMTP Authentication Error: Check your email/password (Use an App Password if necessary).")
+    except smtplib.SMTPConnectError:
+        print(" SMTP Connection Error: Gmail might be blocking access.")
+    except smtplib.SMTPException as e:
+        print(f" SMTP Error: {e}")
+
 
 
 @app.route('/api/chat', methods=['POST'])
@@ -273,7 +313,7 @@ def get_chat(chat_id):
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    """Register a new user with hashed password."""
+    """Register a new user with hashed password and send a verification email."""
     try:
         data = request.json
         email = data.get("email")
@@ -285,15 +325,12 @@ def register():
         if not is_strong_password(password):
             return jsonify({"error": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."}), 400
 
-        # Check if user already exists
         if users_collection.find_one({"email": email}):
             return jsonify({"error": "User already exists"}), 400
 
-        # Hash the password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         verification_token = str(ObjectId())
 
-        # Insert user into database
         user = {
             "email": email,
             "password": hashed_password,
@@ -303,17 +340,21 @@ def register():
         }
         user_id = users_collection.insert_one(user).inserted_id
 
-         # **Debugging Prints**
-        print(f"✅ User registered: {email}")
-        print(f"✅ Calling send_verification_email with token: {verification_token}")
+        print(f" User registered: {email}")
+        print(f" Calling send_verification_email with token: {verification_token}")
 
         # Call the function
         send_verification_email(email, verification_token)
 
-        return jsonify({"message": "Registration successful! Please verify your email."}), 201
+        return jsonify({
+            "message": "Registration successful! Please verify your email.",
+            "user_id": str(user_id)
+        }), 201
     except Exception as e:
-        print(f"❌ Error in /api/register: {str(e)}")
+        print(f" Error in /api/register: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
+
+
 
 @app.route('/api/verify-email/<token>', methods=['GET'])
 def verify_email(token):
