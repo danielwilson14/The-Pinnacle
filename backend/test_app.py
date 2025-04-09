@@ -2,7 +2,7 @@ import os
 os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"  # ✅ Set first
 
 import unittest
-from main import app  # ✅ Import AFTER setting env var
+from backend.main import app
 
 class BasicTests(unittest.TestCase):
 
