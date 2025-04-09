@@ -1,12 +1,12 @@
-import unittest
-from main import app
 import os
-os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"
+os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"  # ✅ Set first
+
+import unittest
+from main import app  # ✅ Import AFTER setting env var
 
 class BasicTests(unittest.TestCase):
 
     def setUp(self):
-        # Set up a test client before each test
         self.app = app.test_client()
         self.app.testing = True
 
