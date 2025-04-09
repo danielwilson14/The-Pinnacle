@@ -1,5 +1,7 @@
 import unittest
 from main import app
+import os
+os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"
 
 class BasicTests(unittest.TestCase):
 
