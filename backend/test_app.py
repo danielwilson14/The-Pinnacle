@@ -4,6 +4,7 @@ from backend.main import app, mongo
 from bson.objectid import ObjectId
 
 # Set up dummy environment variables for testing
+os.environ["ENV"] = "CI"
 os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"
 os.environ["OPENAI_KEY"] = "fake-key"
 os.environ["SECRET_KEY"] = "supersecretkey"
