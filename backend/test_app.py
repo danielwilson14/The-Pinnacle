@@ -35,7 +35,7 @@ class BackendTests(unittest.TestCase):
     @patch("backend.main.call_openai", return_value="This is a test summary.")
     def test_register_and_login(self, mock_openai):
         # Register user
-        email = "testuser@example.com"
+        email = f"testuser_{ObjectId()}@example.com"
         password = "Password1!"
         reg = self.app.post('/api/register', json={"email": email, "password": password})
         self.assertEqual(reg.status_code, 201)
