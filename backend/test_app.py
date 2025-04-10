@@ -9,10 +9,7 @@ from unittest.mock import patch
 from backend.main import app, mongo
 from bson.objectid import ObjectId
 
-@patch("backend.main.call_openai", return_value="This is a test summary.")
 class BackendTests(unittest.TestCase):
-    ...
-
 
     def setUp(self):
         self.app = app.test_client()
@@ -35,7 +32,8 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'MongoDB connection successful', response.data)
 
-    def test_register_and_login(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_register_and_login(self, mock_openai):
         # Register user
         email = "testuser@example.com"
         password = "Password1!"
@@ -56,7 +54,8 @@ class BackendTests(unittest.TestCase):
         self.user_id = user_id
         self.token = login_data["token"]
 
-    def test_update_profile(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_update_profile(self, mock_openai):
         self.test_register_and_login()
         update = self.app.post('/api/user/update', json={
             "user_id": self.user_id,
@@ -68,7 +67,8 @@ class BackendTests(unittest.TestCase):
         })
         self.assertEqual(update.status_code, 200)
 
-    def test_create_chat_and_toggle_favourite(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_create_chat_and_toggle_favourite(self, mock_openai):
         self.test_register_and_login()
 
         # Send a test chat message
@@ -84,21 +84,24 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(fav.status_code, 200)
         self.assertIn("isFavourited", fav.get_json())
 
-    def test_get_favourites(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_get_favourites(self, mock_openai):
         self.test_create_chat_and_toggle_favourite()
         response = self.app.get(f'/api/favourites?user_id={self.user_id}')
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertIsInstance(data, list)
 
-    def test_calendar_view(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_calendar_view(self, mock_openai):
         self.test_create_chat_and_toggle_favourite()
         response = self.app.get(f'/api/calendar?user_id={self.user_id}')
         self.assertEqual(response.status_code, 200)
         calendar = response.get_json()
         self.assertIsInstance(calendar, dict)
 
-    def test_change_password(self):
+    @patch("backend.main.call_openai", return_value="This is a test summary.")
+    def test_change_password(self, mock_openai):
         self.test_register_and_login()
         new_pass = self.app.post('/api/user/change-password', json={
             "user_id": self.user_id,
