@@ -1,15 +1,18 @@
 import os
-import unittest
-from backend.main import app, mongo
-from bson.objectid import ObjectId
-
-# Set up dummy environment variables for testing
 os.environ["ENV"] = "CI"
 os.environ["MONGO_URI"] = "mongodb://localhost:27017/test"
 os.environ["OPENAI_KEY"] = "fake-key"
 os.environ["SECRET_KEY"] = "supersecretkey"
 
+import unittest
+from unittest.mock import patch
+from backend.main import app, mongo
+from bson.objectid import ObjectId
+
+@patch("backend.main.call_openai", return_value="This is a test summary.")
 class BackendTests(unittest.TestCase):
+    ...
+
 
     def setUp(self):
         self.app = app.test_client()
@@ -24,7 +27,7 @@ class BackendTests(unittest.TestCase):
         response = self.app.get('/test-env')
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertTrue(data['OPENAI_KEY_loaded'])
+        self.assertTrue(data['OPENAI_KEY_loaded']) 
         self.assertIn('MONGO_URI', data)
 
     def test_db_connection(self):
