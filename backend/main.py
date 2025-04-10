@@ -106,6 +106,11 @@ def is_strong_password(password):
     return True
 
 def send_verification_email(user_email, token):
+    
+    if os.getenv("ENV") == "CI":
+        print("CI mode: Skipping real email sending.")
+        return
+
     """Send a verification email with a unique token."""
     try:
         verification_link = f"{os.getenv('FRONTEND_URL')}/verify/{token}"
