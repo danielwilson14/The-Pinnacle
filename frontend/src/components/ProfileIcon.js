@@ -151,37 +151,42 @@ const ProfileIcon = () => {
           )}
           {isEditing ? (
             <div className="edit-section">
-              <label>Display Name:</label>
+              <label htmlFor="display_name">Display Name:</label>
               <input
+                id="display_name"
                 type="text"
                 name="display_name"
                 value={profile.display_name}
                 onChange={handleChange}
               />
 
-              <label>Date of Birth:</label>
+              <label htmlFor="dob">Date of Birth:</label>
               <input
+                id="dob"
                 type="date"
                 name="dob"
                 value={profile.dob}
                 onChange={handleChange}
               />
 
-              <label>Location:</label>
+              <label htmlFor="location">Location:</label>
               <input
+                id="location"
                 type="text"
                 name="location"
                 value={profile.location}
                 onChange={handleChange}
               />
 
-              <label>Pronouns:</label>
+              <label htmlFor="pronouns">Pronouns:</label>
               <input
+                id="pronouns"
                 type="text"
                 name="pronouns"
                 value={profile.pronouns}
                 onChange={handleChange}
               />
+
 
               <div className="button-group">
                 <button className="action-button" onClick={handleSave}>Save</button>
@@ -254,7 +259,7 @@ const ProfileIcon = () => {
 
   return (
     <>
-      <div className="profile-icon-container" onClick={togglePopup}>
+      <div className="profile-icon-container" data-testid="profile-icon-container" onClick={togglePopup}>
         <FaUserCircle className="profile-icon" />
       </div>
       {showPopup && (

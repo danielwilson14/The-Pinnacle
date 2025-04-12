@@ -13,6 +13,17 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockedNavigate,
 }));
 
+// Suppress deprecation & router warnings during tests
+beforeAll(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  console.warn.mockRestore();
+  console.error.mockRestore();
+});
+
 describe('RegisterPage', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -21,44 +32,45 @@ describe('RegisterPage', () => {
 
   test('renders registration form elements', () => {
     render(<RegisterPage />, { wrapper: MemoryRouter });
-    expect(screen.getByPlaceholderText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Password/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Confirm Password/i)).toBeInTheDocument();
-    expect(screen.getByText(/Register/i)).toBeInTheDocument();
+
+    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Confirm Password')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Register$/i })).toBeInTheDocument();
     expect(screen.getByText(/Already have an account/i)).toBeInTheDocument();
   });
 
   test('shows error if passwords do not match', async () => {
     render(<RegisterPage />, { wrapper: MemoryRouter });
 
-    fireEvent.change(screen.getByPlaceholderText(/Email/i), {
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
       target: { value: 'StrongPass123!' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), {
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
       target: { value: 'Mismatch123' },
     });
 
-    fireEvent.click(screen.getByText(/^Register$/i));
+    fireEvent.click(screen.getByRole('button', { name: /^Register$/i }));
     expect(await screen.findByText(/Passwords do not match/i)).toBeInTheDocument();
   });
 
   test('shows error for weak password', async () => {
     render(<RegisterPage />, { wrapper: MemoryRouter });
 
-    fireEvent.change(screen.getByPlaceholderText(/Email/i), {
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
       target: { value: 'test@example.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
       target: { value: 'weak' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), {
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
       target: { value: 'weak' },
     });
 
-    fireEvent.click(screen.getByText(/^Register$/i));
+    fireEvent.click(screen.getByRole('button', { name: /^Register$/i }));
     expect(await screen.findByText(/too weak/i)).toBeInTheDocument();
   });
 
@@ -69,17 +81,17 @@ describe('RegisterPage', () => {
 
     render(<RegisterPage />, { wrapper: MemoryRouter });
 
-    fireEvent.change(screen.getByPlaceholderText(/Email/i), {
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
       target: { value: 'user@test.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
       target: { value: 'StrongPass123!' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), {
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
       target: { value: 'StrongPass123!' },
     });
 
-    fireEvent.click(screen.getByText(/^Register$/i));
+    fireEvent.click(screen.getByRole('button', { name: /^Register$/i }));
 
     await waitFor(() => {
       expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('/api/register'), {
@@ -97,17 +109,17 @@ describe('RegisterPage', () => {
 
     render(<RegisterPage />, { wrapper: MemoryRouter });
 
-    fireEvent.change(screen.getByPlaceholderText(/Email/i), {
+    fireEvent.change(screen.getByPlaceholderText('Email'), {
       target: { value: 'user@test.com' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/^Password$/i), {
+    fireEvent.change(screen.getByPlaceholderText('Password'), {
       target: { value: 'StrongPass123!' },
     });
-    fireEvent.change(screen.getByPlaceholderText(/Confirm Password/i), {
+    fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
       target: { value: 'StrongPass123!' },
     });
 
-    fireEvent.click(screen.getByText(/^Register$/i));
+    fireEvent.click(screen.getByRole('button', { name: /^Register$/i }));
 
     expect(await screen.findByText(/Email already in use/i)).toBeInTheDocument();
   });
