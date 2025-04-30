@@ -80,11 +80,11 @@ def call_openai(messages):
         response = openai.chat.completions.create(
             model=OPENAI_MODEL,
             messages=full_conversation,
-            max_tokens=500,  # ⬆ Increased from 150 to 500 for longer responses
+            max_tokens=500,  
             temperature=0.7
         )
 
-        return response.choices[0].message.content.strip()  # Ensure clean output
+        return response.choices[0].message.content.strip()  
 
     except Exception as e:
         print(f"Error in OpenAI API call: {e}")
